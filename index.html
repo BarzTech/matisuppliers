@@ -1,7 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MATI SUPPLIERS INTERNATIONAL-SMC LTD | Procurement & Supply Chain Solutions</title>
@@ -322,11 +321,17 @@
             height: 100%;
             object-fit: cover;
             object-position: center;
+            transition: transform 0.3s ease;
+        }
+        
+        .product-card:hover .product-img img {
+            transform: scale(1.05);
         }
         
         .product-img i {
             font-size: 50px;
             color: var(--green);
+            opacity: 0.5;
         }
         
         .product-info {
@@ -676,10 +681,17 @@
                 <button class="filter-btn" data-filter="medical">Medical</button>
                 <button class="filter-btn" data-filter="security">Security</button>
                 <button class="filter-btn" data-filter="office">Office Supplies</button>
+                <button class="filter-btn" data-filter="academic">Academic</button>
+                <button class="filter-btn" data-filter="branding">Branding</button>
+                <button class="filter-btn" data-filter="other">Other</button>
             </div>
             
             <div class="products-grid" id="productsContainer">
-                <!-- Products will be loaded here -->
+                <!-- Products will be loaded here from Google Sheets -->
+                <div class="loading-message" style="grid-column: 1/-1; text-align: center; padding: 40px;">
+                    <i class="fas fa-spinner fa-spin fa-2x" style="color: var(--green); margin-bottom: 15px;"></i>
+                    <p>Loading products from Google Sheets...</p>
+                </div>
             </div>
         </div>
     </section>
@@ -739,6 +751,7 @@
                         </div>
                     </div>
                 </div>
+            </div>
         </div>
     </section>
 
@@ -792,238 +805,346 @@
         </div>
         
         <div class="copyright">
-            <p>&copy; 2026 MATI SUPPLIERS INTERNATIONAL-SMC LTD. All rights reserved. | Developed and run by <a href="https://wa.me/256707805112" target="_blank">
-    #sitesbybarz
-</a></p>
+            <p>&copy; 2026 MATI SUPPLIERS INTERNATIONAL-SMC LTD. All rights reserved. | Developed and run by <a href="https://wa.me/256707805112" target="_blank">#sitesbybarz</a></p>
         </div>
     </footer>
 
-   <script>
-  // ================= SUPABASE SETUP =================
-  const SUPABASE_URL = 'https://dwhjnlawfsacdhpllres.supabase.co';
-  const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImR3aGpubGF3ZnNhY2RocGxscmVzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzAzOTk2MzcsImV4cCI6MjA4NTk3NTYzN30.6t0bAZK305R1Kf1BkF3UxUG6cppgQZuz0Ucg1iQkJZY';
-  
-  // Initialize Supabase
-  const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-  
-  // Global products array
-  let products = [];
-  
-  // ================= WEBSITE INITIALIZATION =================
-  document.addEventListener('DOMContentLoaded', async function() {
-    // Setup event listeners first
-    setupEventListeners();
-    
-    // Load products from Supabase database
-    await loadProductsFromDatabase();
-    
-    // Display products
-    displayProducts();
-  });
-  
-  // ================= LOAD PRODUCTS FROM SUPABASE =================
-  async function loadProductsFromDatabase() {
-    try {
-      console.log('Loading products from Supabase...');
-      
-      const { data, error } = await supabase
-        .from('products')
-        .select('*')
-        .eq('status', 'active')
-        .order('created_at', { ascending: false });
-      
-      if (error) {
-        console.error('Supabase error:', error);
-        throw error;
-      }
-      
-      console.log('Products loaded:', data?.length || 0);
-      products = data || [];
-      
-      // Also save to localStorage as backup
-      if (products.length > 0) {
-        localStorage.setItem('matiProducts', JSON.stringify(products));
-      }
-      
-    } catch (error) {
-      console.error('Error loading products from Supabase:', error);
-      // Fallback to localStorage if Supabase fails
-      const localProducts = JSON.parse(localStorage.getItem('matiProducts')) || [];
-      products = localProducts;
-      console.log('Using localStorage backup products:', products.length);
-    }
-  }
-  
-  // ================= DISPLAY PRODUCTS =================
-  function displayProducts(filter = 'all') {
-    const productsContainer = document.getElementById('productsContainer');
-    if (!productsContainer) return;
-    
-    productsContainer.innerHTML = '';
-    
-    // Filter products
-    const filteredProducts = filter === 'all' 
-      ? products.filter(p => p.status === 'active')
-      : products.filter(p => p.category === filter && p.status === 'active');
-    
-    if (filteredProducts.length === 0) {
-      productsContainer.innerHTML = '<p style="text-align: center; grid-column: 1/-1; padding: 40px; color: var(--gray);">No products found in this category.</p>';
-      return;
-    }
-    
-    // Category names mapping
-    const categoryNames = {
-      'it': 'IT Equipment',
-      'medical': 'Medical Equipment',
-      'security': 'Security Equipment',
-      'office': 'Office Supplies',
-      'academic': 'Academic Supplies',
-      'branding': 'Branding & Advertising',
-      'other': 'Other'
-    };
-    
-    filteredProducts.forEach(product => {
-      const productCard = document.createElement('div');
-      productCard.className = 'product-card';
-      
-      // Get category name
-      const categoryName = categoryNames[product.category] || 'Unknown';
-      
-      // Format price in UGX with commas
-      const formattedPrice = product.price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-      
-      // SMART IMAGE HANDLING FOR ALL FORMATS:
-      let imageContent = '';
-      const imageData = product.image;
-      
-      // Case 1: Base64 image stored in localStorage
-      if (imageData && imageData.startsWith('mati_product_image_')) {
-        const base64Image = localStorage.getItem(imageData);
-        if (base64Image) {
-          imageContent = `<img src="${base64Image}" alt="${product.name}">`;
-        } else {
-          // Fallback if base64 not found
-          imageContent = getFallbackIcon(product.category);
-        }
-      }
-      // Case 2: External URL or uploaded file path
-      else if (imageData && (imageData.startsWith('http') || imageData.includes('.jpg') || imageData.includes('.png') || imageData.includes('.jpeg'))) {
-        imageContent = `<img src="${imageData}" alt="${product.name}">`;
-      }
-      // Case 3: Font Awesome icon (old format)
-      else if (imageData && imageData.startsWith('fas fa-')) {
-        imageContent = `<i class="${imageData}"></i>`;
-      }
-      // Case 4: No image data - use category-based icon
-      else {
-        imageContent = getFallbackIcon(product.category);
-      }
-      
-      productCard.innerHTML = `
-        <div class="product-img">
-          ${imageContent}
-        </div>
-        <div class="product-info">
-          <span class="product-category">${categoryName}</span>
-          <h3>${product.name}</h3>
-          <p>${product.description ? product.description.substring(0, 80) + (product.description.length > 80 ? '...' : '') : 'No description available'}</p>
-          <div class="product-price">UGX ${formattedPrice}</div>
-          <button class="cta-button" onclick="requestProductQuotation(${product.id})" style="padding: 10px 20px; font-size: 14px; width: 100%;">
-            <i class="fas fa-quote-right"></i> Request Quote
-          </button>
-        </div>
-      `;
-      
-      productsContainer.appendChild(productCard);
-    });
-  }
-  
-  // Helper function for fallback icons
-  function getFallbackIcon(category) {
-    const icons = {
-      'it': 'fas fa-laptop',
-      'medical': 'fas fa-user-md',
-      'security': 'fas fa-shield-alt',
-      'office': 'fas fa-chair',
-      'academic': 'fas fa-graduation-cap',
-      'branding': 'fas fa-bullhorn',
-      'other': 'fas fa-box'
-    };
-    const iconClass = icons[category] || 'fas fa-box';
-    return `<i class="${iconClass}"></i>`;
-  }
-  
-  function requestProductQuotation(productId) {
-    const product = products.find(p => p.id === productId);
-    if (!product) return;
-
-    const message = `Hello MATI SUPPLIERS,%0A%0AI'm interested in the following product:%0A%0A` +
-      `Product: ${product.name}%0A` +
-      `Category: ${product.category}%0A` +
-      `Price: UGX ${product.price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")}%0A%0A` +
-      `Please send me a quotation.`;
-
-    const phone = "256753402888"; // your WhatsApp number
-    window.open(`https://wa.me/${phone}?text=${message}`, "_blank");
-  }
-  
-  // ================= EVENT LISTENERS =================
-  function setupEventListeners() {
-    // Mobile menu toggle
-    const menuBtn = document.getElementById('menuBtn');
-    const navMenu = document.getElementById('navMenu');
-    
-    if (menuBtn && navMenu) {
-      menuBtn.addEventListener('click', () => {
-        navMenu.classList.toggle('active');
-        menuBtn.innerHTML = navMenu.classList.contains('active') 
-          ? '<i class="fas fa-times"></i>' 
-          : '<i class="fas fa-bars"></i>';
-      });
-    }
-    
-    // Filter products on main site
-    const filterBtns = document.querySelectorAll('.filter-btn');
-    filterBtns.forEach(btn => {
-      btn.addEventListener('click', () => {
-        filterBtns.forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
-        displayProducts(btn.getAttribute('data-filter'));
-      });
-    });
-    
-    // Smooth scrolling for anchor links
-    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-      anchor.addEventListener('click', function(e) {
-        const href = this.getAttribute('href');
-        if (href === '#' || href.startsWith('#!')) return;
+    <script>
+        // ================= GOOGLE SHEETS CONFIGURATION =================
+        const GOOGLE_SHEETS_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRVOL6rI9nUxm-bZURwflTwthZR3ZtzLYGFDMZMNgdN0XcmJi6ngpTeMthNmyenoMHZi2-ca4cMeZof/pub?output=csv';
         
-        const targetId = href;
-        const targetElement = document.querySelector(targetId);
+        // Global products array
+        let products = [];
         
-        if (targetElement) {
-          e.preventDefault();
-          
-          // Close mobile menu if open
-          if (navMenu) {
-            navMenu.classList.remove('active');
-            if (menuBtn) {
-              menuBtn.innerHTML = '<i class="fas fa-bars"></i>';
+        // ================= WEBSITE INITIALIZATION =================
+        document.addEventListener('DOMContentLoaded', async function() {
+            console.log('MATI SUPPLIERS Website Initializing...');
+            
+            // Setup event listeners first
+            setupEventListeners();
+            
+            // Load products from Google Sheets
+            await loadProductsFromGoogleSheets();
+            
+            // Display products
+            displayProducts();
+            
+            console.log('Website initialization complete.');
+        });
+        
+        // ================= LOAD PRODUCTS FROM GOOGLE SHEETS =================
+        async function loadProductsFromGoogleSheets() {
+            try {
+                console.log('Loading products from Google Sheets...');
+                
+                const response = await fetch(GOOGLE_SHEETS_URL);
+                const csvText = await response.text();
+                
+                // Parse CSV with proper handling
+                products = parseCSV(csvText);
+                
+                console.log('Products loaded from Google Sheets:', products.length);
+                
+                // Save to localStorage as backup
+                if (products.length > 0) {
+                    localStorage.setItem('matiProducts', JSON.stringify(products));
+                    console.log('Products saved to local storage backup.');
+                }
+                
+                return products;
+                
+            } catch (error) {
+                console.error('Error loading products from Google Sheets:', error);
+                // Fallback to localStorage if Google Sheets fails
+                const localProducts = JSON.parse(localStorage.getItem('matiProducts')) || [];
+                products = localProducts;
+                console.log('Using local storage backup products:', products.length);
+                return products;
             }
-          }
-          
-          window.scrollTo({
-            top: targetElement.offsetTop - 80,
-            behavior: 'smooth'
-          });
         }
-      });
-    });
-  }
-  
-  // Make functions available globally
-  window.requestProductQuotation = requestProductQuotation;
-  window.displayProducts = displayProducts;
-</script>
+        
+        // Helper function to parse CSV with quotes
+        function parseCSV(csvText) {
+            const lines = csvText.split('\n').filter(line => line.trim() !== '');
+            if (lines.length < 2) {
+                console.log('No data found in Google Sheets or CSV is empty.');
+                return [];
+            }
+            
+            const headers = parseCSVLine(lines[0]);
+            const products = [];
+            
+            console.log('CSV Headers:', headers);
+            
+            for (let i = 1; i < lines.length; i++) {
+                const values = parseCSVLine(lines[i]);
+                const product = {};
+                
+                // Map headers to values
+                headers.forEach((header, index) => {
+                    if (index < values.length) {
+                        product[header.toLowerCase()] = values[index].trim();
+                    }
+                });
+                
+                // Ensure required fields exist with proper defaults
+                const processedProduct = {
+                    id: parseInt(product.id || product.ID || i),
+                    name: product.name || product.Name || 'Unnamed Product',
+                    category: product.category || product.Category || 'other',
+                    price: parseInt(product.price || product.Price || 0),
+                    description: product.description || product.Description || 'No description available',
+                    image: product.image || product.Image || '',
+                    status: product.status || product.Status || 'active',
+                    stock: parseInt(product.stock || product.Stock || 0)
+                };
+                
+                // Only add active products
+                if (processedProduct.status === 'active') {
+                    products.push(processedProduct);
+                }
+            }
+            
+            console.log('Parsed products:', products);
+            return products;
+        }
+        
+        // Parse CSV line considering quotes
+        function parseCSVLine(line) {
+            const values = [];
+            let current = '';
+            let inQuotes = false;
+            
+            for (let i = 0; i < line.length; i++) {
+                const char = line[i];
+                const nextChar = line[i + 1];
+                
+                if (char === '"') {
+                    if (inQuotes && nextChar === '"') {
+                        current += '"';
+                        i++; // Skip next quote
+                    } else {
+                        inQuotes = !inQuotes;
+                    }
+                } else if (char === ',' && !inQuotes) {
+                    values.push(current);
+                    current = '';
+                } else {
+                    current += char;
+                }
+            }
+            
+            values.push(current);
+            return values;
+        }
+        
+        // ================= DISPLAY PRODUCTS =================
+        function displayProducts(filter = 'all') {
+            const productsContainer = document.getElementById('productsContainer');
+            if (!productsContainer) return;
+            
+            productsContainer.innerHTML = '';
+            
+            // Filter products
+            const filteredProducts = filter === 'all' 
+                ? products.filter(p => p.status === 'active')
+                : products.filter(p => p.category === filter && p.status === 'active');
+            
+            if (filteredProducts.length === 0) {
+                productsContainer.innerHTML = `
+                    <div style="text-align: center; grid-column: 1/-1; padding: 40px; color: var(--gray);">
+                        <i class="fas fa-box-open fa-2x" style="margin-bottom: 15px; display: block; color: #ccc;"></i>
+                        <p>No products found in this category.</p>
+                        <p style="font-size: 14px; margin-top: 10px;">Add products to your Google Sheet to see them here.</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            // Category names mapping
+            const categoryNames = {
+                'it': 'IT Equipment',
+                'medical': 'Medical Equipment',
+                'security': 'Security Equipment',
+                'office': 'Office Supplies',
+                'academic': 'Academic Supplies',
+                'branding': 'Branding & Advertising',
+                'other': 'Other'
+            };
+            
+            filteredProducts.forEach(product => {
+                const productCard = document.createElement('div');
+                productCard.className = 'product-card';
+                
+                // Get category name
+                const categoryName = categoryNames[product.category] || 'Unknown';
+                
+                // Format price in UGX with commas
+                const formattedPrice = product.price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+                
+                // IMAGE HANDLING - PRIORITIZE IMAGE URLs
+                let imageContent = '';
+                
+                if (product.image && product.image.trim() !== '') {
+                    // Check if it's a valid URL (http/https) or data URL
+                    if (product.image.startsWith('http') || product.image.startsWith('https') || product.image.startsWith('data:image')) {
+                        imageContent = `<img src="${product.image}" alt="${product.name}" loading="lazy">`;
+                    } 
+                    // If it's a Font Awesome icon (backwards compatibility)
+                    else if (product.image.startsWith('fas fa-') || product.image.startsWith('fab fa-')) {
+                        imageContent = `<i class="${product.image} fa-3x" style="color: var(--green); opacity: 0.7;"></i>`;
+                    }
+                    // If empty or invalid, use category-based fallback
+                    else {
+                        imageContent = getFallbackIcon(product.category);
+                    }
+                } else {
+                    // No image provided
+                    imageContent = getFallbackIcon(product.category);
+                }
+                
+                productCard.innerHTML = `
+                    <div class="product-img">
+                        ${imageContent}
+                    </div>
+                    <div class="product-info">
+                        <span class="product-category">${categoryName}</span>
+                        <h3>${product.name}</h3>
+                        <p>${product.description ? product.description.substring(0, 80) + (product.description.length > 80 ? '...' : '') : 'No description available'}</p>
+                        <div class="product-price">UGX ${formattedPrice}</div>
+                        <button class="cta-button" onclick="requestProductQuotation(${product.id})" style="padding: 10px 20px; font-size: 14px; width: 100%;">
+                            <i class="fas fa-quote-right"></i> Request Quote
+                        </button>
+                    </div>
+                `;
+                
+                productsContainer.appendChild(productCard);
+            });
+        }
+        
+        // Helper function for fallback icons (when no image URL is provided)
+        function getFallbackIcon(category) {
+            const icons = {
+                'it': 'fas fa-laptop',
+                'medical': 'fas fa-user-md',
+                'security': 'fas fa-shield-alt',
+                'office': 'fas fa-chair',
+                'academic': 'fas fa-graduation-cap',
+                'branding': 'fas fa-bullhorn',
+                'other': 'fas fa-box'
+            };
+            const iconClass = icons[category] || 'fas fa-box';
+            return `<i class="${iconClass} fa-3x" style="color: var(--green); opacity: 0.5;"></i>`;
+        }
+        
+        function requestProductQuotation(productId) {
+            const product = products.find(p => p.id === productId);
+            if (!product) {
+                alert('Product not found. Please try again.');
+                return;
+            }
+
+            const message = `Hello MATI SUPPLIERS,%0A%0AI'm interested in the following product:%0A%0A` +
+                `Product: ${product.name}%0A` +
+                `Category: ${product.category}%0A` +
+                `Price: UGX ${product.price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")}%0A` +
+                `Description: ${product.description.substring(0, 100)}%0A%0A` +
+                `Please send me a quotation with more details.`;
+
+            const phone = "256753402888";
+            window.open(`https://wa.me/${phone}?text=${message}`, "_blank");
+        }
+        
+        // ================= EVENT LISTENERS =================
+        function setupEventListeners() {
+            // Mobile menu toggle
+            const menuBtn = document.getElementById('menuBtn');
+            const navMenu = document.getElementById('navMenu');
+            
+            if (menuBtn && navMenu) {
+                menuBtn.addEventListener('click', () => {
+                    navMenu.classList.toggle('active');
+                    menuBtn.innerHTML = navMenu.classList.contains('active') 
+                        ? '<i class="fas fa-times"></i>' 
+                        : '<i class="fas fa-bars"></i>';
+                });
+            }
+            
+            // Filter products on main site
+            const filterBtns = document.querySelectorAll('.filter-btn');
+            filterBtns.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    filterBtns.forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    displayProducts(btn.getAttribute('data-filter'));
+                });
+            });
+            
+            // Smooth scrolling for anchor links
+            document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+                anchor.addEventListener('click', function(e) {
+                    const href = this.getAttribute('href');
+                    if (href === '#' || href.startsWith('#!')) return;
+                    
+                    const targetId = href;
+                    const targetElement = document.querySelector(targetId);
+                    
+                    if (targetElement) {
+                        e.preventDefault();
+                        
+                        // Close mobile menu if open
+                        if (navMenu) {
+                            navMenu.classList.remove('active');
+                            if (menuBtn) {
+                                menuBtn.innerHTML = '<i class="fas fa-bars"></i>';
+                            }
+                        }
+                        
+                        window.scrollTo({
+                            top: targetElement.offsetTop - 80,
+                            behavior: 'smooth'
+                        });
+                    }
+                });
+            });
+        }
+        
+        // ================= TESTING AND DEBUGGING FUNCTIONS =================
+        // Test Google Sheets connection
+        async function testGoogleSheetsConnection() {
+            try {
+                const response = await fetch(GOOGLE_SHEETS_URL);
+                const csvText = await response.text();
+                const lines = csvText.split('\n').filter(line => line.trim() !== '');
+                
+                alert(`✅ Google Sheets Connection Test Successful!\n\n` +
+                      `Rows found: ${lines.length}\n` +
+                      `First row (headers): ${lines[0]}\n` +
+                      `Data rows: ${lines.length - 1}`);
+                
+                return true;
+            } catch (error) {
+                alert(`❌ Google Sheets Connection Failed!\n\nError: ${error.message}`);
+                return false;
+            }
+        }
+        
+        // Reload products manually
+        async function reloadProducts() {
+            console.log('Manual reload triggered...');
+            await loadProductsFromGoogleSheets();
+            displayProducts();
+            alert(`Products reloaded! Found ${products.length} active products.`);
+        }
+        
+        // Make functions available globally
+        window.requestProductQuotation = requestProductQuotation;
+        window.displayProducts = displayProducts;
+        window.testGoogleSheetsConnection = testGoogleSheetsConnection;
+        window.reloadProducts = reloadProducts;
+        
+        // Log website ready message
+        console.log('MATI SUPPLIERS Website JavaScript loaded successfully.');
+    </script>
 </body>
 </html>
