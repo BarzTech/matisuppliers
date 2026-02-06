@@ -1,0 +1,104 @@
+name: Update Products from Google Sheets
+
+on:
+  # Run automatically every 6 hours
+  schedule:
+    - cron: '0 */6 * * *'
+  
+  # Run manually from GitHub UI
+  workflow_dispatch:
+  
+  # Run when Google Sheets script is updated
+  push:
+    paths:
+      - 'generate-products.js'
+      - '.github/workflows/update-products.yml'
+
+jobs:
+  update-products:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write  # This allows the action to push changes
+    
+    steps:
+    # Step 1: Checkout the repository
+    - name: Checkout repository
+      uses: actions/checkout@v4
+      with:
+        token: ${{ secrets.GITHUB_TOKEN }}
+    
+    # Step 2: Setup Node.js
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        cache: 'npm'
+    
+    # Step 3: Install dependencies (if any)
+    - name: Install dependencies
+      run: |
+        # Create a simple package.json if it doesn't exist
+        if [ ! -f package.json ]; then
+          echo '{"name":"mati-suppliers","version":"1.0.0","private":true}' > package.json
+        fi
+    
+    # Step 4: Run the Google Sheets script
+    - name: Generate products.json
+      run: |
+        node generate-products.js
+        
+        # Show what was generated
+        echo "=== Generated products.json ==="
+        head -20 products.json
+        
+        echo "=== Generated products.js ==="
+        head -10 products.js
+        
+        # Count products
+        PRODUCT_COUNT=$(node -e "const data = require('./products.json'); console.log(data.products.length)")
+        echo "📦 Products generated: $PRODUCT_COUNT"
+    
+    # Step 5: Commit and push changes if there are any
+    - name: Commit and push changes
+      run: |
+        # Configure git
+        git config --local user.email "github-actions[bot]@users.noreply.github.com"
+        git config --local user.name "GitHub Actions Bot"
+        
+        # Check if there are any changes
+        git add products.json products.js
+        
+        # Check if there are changes to commit
+        if git diff --quiet && git diff --staged --quiet; then
+          echo "✅ No changes to commit. Products are up to date."
+        else
+          # Commit the changes
+          git commit -m "🔄 Auto-update products from Google Sheets [$(date +'%Y-%m-%d %H:%M')]"
+          
+          # Push changes
+          git push
+          echo "✅ Successfully updated products and pushed to repository."
+        fi
+    
+    # Step 6: Output success message
+    - name: Success Notification
+      if: success()
+      run: |
+        echo "🎉 Products updated successfully!"
+        echo "📊 Products will be live on the website in a few minutes."
+        echo "⏰ Next auto-update in 6 hours."
+        echo ""
+        echo "To manually trigger update:"
+        echo "1. Go to GitHub Repository → Actions"
+        echo "2. Click 'Update Products from Google Sheets'"
+        echo "3. Click 'Run workflow' → 'Run workflow'"
+    
+    # Step 7: Error handling
+    - name: Error Notification
+      if: failure()
+      run: |
+        echo "❌ Failed to update products from Google Sheets"
+        echo "Please check:"
+        echo "1. Google Sheet is publicly accessible"
+        echo "2. generate-products.js has correct Sheet ID"
+        echo "3. GitHub Actions permissions are set"
