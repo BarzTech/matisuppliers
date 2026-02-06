@@ -798,28 +798,27 @@
         </div>
     </footer>
 
-    <script>
+   <script>
   // ================= SUPABASE SETUP =================
-  // REPLACE THESE WITH YOUR ACTUAL VALUES!
-  const SUPABASE_URL = 'https://dwhjnlawfsacdhpllres.supabase.co';  // Your Project URL
-  const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImR3aGpubGF3ZnNhY2RocGxscmVzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzAzOTk2MzcsImV4cCI6MjA4NTk3NTYzN30.6t0bAZK305R1Kf1BkF3UxUG6cppgQZuz0Ucg1iQkJZY';  // Your anon key
+  const SUPABASE_URL = 'https://dwhjnlawfsacdhpllres.supabase.co';
+  const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImR3aGpubGF3ZnNhY2RocGxscmVzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzAzOTk2MzcsImV4cCI6MjA4NTk3NTYzN30.6t0bAZK305R1Kf1BkF3UxUG6cppgQZuz0Ucg1iQkJZY';
   
   // Initialize Supabase
   const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
   
-  // Global products array (will be loaded from Supabase)
+  // Global products array
   let products = [];
   
   // ================= WEBSITE INITIALIZATION =================
   document.addEventListener('DOMContentLoaded', async function() {
+    // Setup event listeners first
+    setupEventListeners();
+    
     // Load products from Supabase database
     await loadProductsFromDatabase();
     
     // Display products
     displayProducts();
-    
-    // Setup event listeners
-    setupEventListeners();
   });
   
   // ================= LOAD PRODUCTS FROM SUPABASE =================
@@ -841,215 +840,190 @@
       console.log('Products loaded:', data?.length || 0);
       products = data || [];
       
+      // Also save to localStorage as backup
+      if (products.length > 0) {
+        localStorage.setItem('matiProducts', JSON.stringify(products));
+      }
+      
     } catch (error) {
-      console.error('Error loading products:', error);
+      console.error('Error loading products from Supabase:', error);
       // Fallback to localStorage if Supabase fails
       const localProducts = JSON.parse(localStorage.getItem('matiProducts')) || [];
       products = localProducts;
+      console.log('Using localStorage backup products:', products.length);
     }
   }
   
   // ================= DISPLAY PRODUCTS =================
-  // KEEP YOUR EXISTING displayProducts() function
-  // It should use the global 'products' array
+  function displayProducts(filter = 'all') {
+    const productsContainer = document.getElementById('productsContainer');
+    if (!productsContainer) return;
+    
+    productsContainer.innerHTML = '';
+    
+    // Filter products
+    const filteredProducts = filter === 'all' 
+      ? products.filter(p => p.status === 'active')
+      : products.filter(p => p.category === filter && p.status === 'active');
+    
+    if (filteredProducts.length === 0) {
+      productsContainer.innerHTML = '<p style="text-align: center; grid-column: 1/-1; padding: 40px; color: var(--gray);">No products found in this category.</p>';
+      return;
+    }
+    
+    // Category names mapping
+    const categoryNames = {
+      'it': 'IT Equipment',
+      'medical': 'Medical Equipment',
+      'security': 'Security Equipment',
+      'office': 'Office Supplies',
+      'academic': 'Academic Supplies',
+      'branding': 'Branding & Advertising',
+      'other': 'Other'
+    };
+    
+    filteredProducts.forEach(product => {
+      const productCard = document.createElement('div');
+      productCard.className = 'product-card';
+      
+      // Get category name
+      const categoryName = categoryNames[product.category] || 'Unknown';
+      
+      // Format price in UGX with commas
+      const formattedPrice = product.price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+      
+      // SMART IMAGE HANDLING FOR ALL FORMATS:
+      let imageContent = '';
+      const imageData = product.image;
+      
+      // Case 1: Base64 image stored in localStorage
+      if (imageData && imageData.startsWith('mati_product_image_')) {
+        const base64Image = localStorage.getItem(imageData);
+        if (base64Image) {
+          imageContent = `<img src="${base64Image}" alt="${product.name}">`;
+        } else {
+          // Fallback if base64 not found
+          imageContent = getFallbackIcon(product.category);
+        }
+      }
+      // Case 2: External URL or uploaded file path
+      else if (imageData && (imageData.startsWith('http') || imageData.includes('.jpg') || imageData.includes('.png') || imageData.includes('.jpeg'))) {
+        imageContent = `<img src="${imageData}" alt="${product.name}">`;
+      }
+      // Case 3: Font Awesome icon (old format)
+      else if (imageData && imageData.startsWith('fas fa-')) {
+        imageContent = `<i class="${imageData}"></i>`;
+      }
+      // Case 4: No image data - use category-based icon
+      else {
+        imageContent = getFallbackIcon(product.category);
+      }
+      
+      productCard.innerHTML = `
+        <div class="product-img">
+          ${imageContent}
+        </div>
+        <div class="product-info">
+          <span class="product-category">${categoryName}</span>
+          <h3>${product.name}</h3>
+          <p>${product.description ? product.description.substring(0, 80) + (product.description.length > 80 ? '...' : '') : 'No description available'}</p>
+          <div class="product-price">UGX ${formattedPrice}</div>
+          <button class="cta-button" onclick="requestProductQuotation(${product.id})" style="padding: 10px 20px; font-size: 14px; width: 100%;">
+            <i class="fas fa-quote-right"></i> Request Quote
+          </button>
+        </div>
+      `;
+      
+      productsContainer.appendChild(productCard);
+    });
+  }
   
-  // ================= EVENT LISTENERS =================
-  // KEEP YOUR EXISTING setupEventListeners() function
+  // Helper function for fallback icons
+  function getFallbackIcon(category) {
+    const icons = {
+      'it': 'fas fa-laptop',
+      'medical': 'fas fa-user-md',
+      'security': 'fas fa-shield-alt',
+      'office': 'fas fa-chair',
+      'academic': 'fas fa-graduation-cap',
+      'branding': 'fas fa-bullhorn',
+      'other': 'fas fa-box'
+    };
+    const iconClass = icons[category] || 'fas fa-box';
+    return `<i class="${iconClass}"></i>`;
+  }
   
-  // ================= MAKE FUNCTIONS GLOBAL =================
-  window.requestProductQuotation = requestProductQuotation;
-  window.displayProducts = displayProducts;
-        
-        // Save products to localStorage
-        function saveProductsToStorage() {
-            localStorage.setItem('matiProducts', JSON.stringify(products));
-        }
-        
-        // Initialize the website
-        document.addEventListener('DOMContentLoaded', function() {
-            // Load products on main site
-            displayProducts();
-            
-            // Set up event listeners
-            setupEventListeners();
-            
-            // Save initial products to localStorage if empty
-            if (!localStorage.getItem('matiProducts')) {
-                saveProductsToStorage();
-            }
-        });
-        
-        function setupEventListeners() {
-            // Mobile menu toggle
-            const menuBtn = document.getElementById('menuBtn');
-            const navMenu = document.getElementById('navMenu');
-            
-            if (menuBtn && navMenu) {
-                menuBtn.addEventListener('click', () => {
-                    navMenu.classList.toggle('active');
-                    menuBtn.innerHTML = navMenu.classList.contains('active') 
-                        ? '<i class="fas fa-times"></i>' 
-                        : '<i class="fas fa-bars"></i>';
-                });
-            }
-            
-            // Filter products on main site
-            const filterBtns = document.querySelectorAll('.filter-btn');
-            filterBtns.forEach(btn => {
-                btn.addEventListener('click', () => {
-                    filterBtns.forEach(b => b.classList.remove('active'));
-                    btn.classList.add('active');
-                    displayProducts(btn.getAttribute('data-filter'));
-                });
-            });
-            
-            // Smooth scrolling for anchor links
-            document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-                anchor.addEventListener('click', function(e) {
-                    const href = this.getAttribute('href');
-                    if (href === '#' || href.startsWith('#!')) return;
-                    
-                    const targetId = href;
-                    const targetElement = document.querySelector(targetId);
-                    
-                    if (targetElement) {
-                        e.preventDefault();
-                        
-                        // Close mobile menu if open
-                        if (navMenu) {
-                            navMenu.classList.remove('active');
-                            if (menuBtn) {
-                                menuBtn.innerHTML = '<i class="fas fa-bars"></i>';
-                            }
-                        }
-                        
-                        window.scrollTo({
-                            top: targetElement.offsetTop - 80,
-                            behavior: 'smooth'
-                        });
-                    }
-                });
-            });
-        }
-        
-        function displayProducts(filter = 'all') {
-            const productsContainer = document.getElementById('productsContainer');
-            if (!productsContainer) return;
-            
-            productsContainer.innerHTML = '';
-            
-            // Filter products
-            const filteredProducts = filter === 'all' 
-                ? products.filter(p => p.status === 'active')
-                : products.filter(p => p.category === filter && p.status === 'active');
-            
-            if (filteredProducts.length === 0) {
-                productsContainer.innerHTML = '<p style="text-align: center; grid-column: 1/-1; padding: 40px; color: var(--gray);">No products found in this category.</p>';
-                return;
-            }
-            
-            // Category names mapping
-            const categoryNames = {
-                'it': 'IT Equipment',
-                'medical': 'Medical Equipment',
-                'security': 'Security Equipment',
-                'office': 'Office Supplies',
-                'academic': 'Academic Supplies',
-                'branding': 'Branding & Advertising',
-                'other': 'Other'
-            };
-            
-            filteredProducts.forEach(product => {
-                const productCard = document.createElement('div');
-                productCard.className = 'product-card';
-                
-                // Get category name
-                const categoryName = categoryNames[product.category] || 'Unknown';
-                
-                // Format price in UGX with commas
-                const formattedPrice = product.price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-                
-                // SMART IMAGE HANDLING FOR ALL FORMATS:
-                let imageContent = '';
-                const imageData = product.image;
-                
-                // Case 1: Base64 image stored in localStorage
-                if (imageData && imageData.startsWith('mati_product_image_')) {
-                    const base64Image = localStorage.getItem(imageData);
-                    if (base64Image) {
-                        imageContent = `<img src="${base64Image}" alt="${product.name}">`;
-                    } else {
-                        // Fallback if base64 not found
-                        imageContent = getFallbackIcon(product.category);
-                    }
-                }
-                // Case 2: External URL or uploaded file path
-                else if (imageData && (imageData.startsWith('http') || imageData.includes('.jpg') || imageData.includes('.png') || imageData.includes('.jpeg'))) {
-                    imageContent = `<img src="${imageData}" alt="${product.name}">`;
-                }
-                // Case 3: Font Awesome icon (old format)
-                else if (imageData && imageData.startsWith('fas fa-')) {
-                    imageContent = `<i class="${imageData}"></i>`;
-                }
-                // Case 4: No image data - use category-based icon
-                else {
-                    imageContent = getFallbackIcon(product.category);
-                }
-                
-                productCard.innerHTML = `
-                    <div class="product-img">
-                        ${imageContent}
-                    </div>
-                    <div class="product-info">
-                        <span class="product-category">${categoryName}</span>
-                        <h3>${product.name}</h3>
-                        <p>${product.description.substring(0, 80)}${product.description.length > 80 ? '...' : ''}</p>
-                        <div class="product-price">UGX ${formattedPrice}</div>
-                        <button class="cta-button" onclick="requestProductQuotation(${product.id})" style="padding: 10px 20px; font-size: 14px; width: 100%;">
-                            <i class="fas fa-quote-right"></i> Request Quote
-                        </button>
-                    </div>
-                `;
-                
-                productsContainer.appendChild(productCard);
-            });
-        }
-        
-        // Helper function for fallback icons
-        function getFallbackIcon(category) {
-            const icons = {
-                'it': 'fas fa-laptop',
-                'medical': 'fas fa-user-md',
-                'security': 'fas fa-shield-alt',
-                'office': 'fas fa-chair',
-                'academic': 'fas fa-graduation-cap',
-                'branding': 'fas fa-bullhorn',
-                'other': 'fas fa-box'
-            };
-            const iconClass = icons[category] || 'fas fa-box';
-            return `<i class="${iconClass}"></i>`;
-        }
-        
-        function requestProductQuotation(productId) {
+  function requestProductQuotation(productId) {
     const product = products.find(p => p.id === productId);
     if (!product) return;
 
     const message = `Hello MATI SUPPLIERS,%0A%0AI'm interested in the following product:%0A%0A` +
-        `Product: ${product.name}%0A` +
-        `Category: ${product.category}%0A` +
-        `Price: UGX ${product.price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")}%0A%0A` +
-        `Please send me a quotation.`;
+      `Product: ${product.name}%0A` +
+      `Category: ${product.category}%0A` +
+      `Price: UGX ${product.price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")}%0A%0A` +
+      `Please send me a quotation.`;
 
     const phone = "256753402888"; // your WhatsApp number
     window.open(`https://wa.me/${phone}?text=${message}`, "_blank");
-}
-
+  }
+  
+  // ================= EVENT LISTENERS =================
+  function setupEventListeners() {
+    // Mobile menu toggle
+    const menuBtn = document.getElementById('menuBtn');
+    const navMenu = document.getElementById('navMenu');
+    
+    if (menuBtn && navMenu) {
+      menuBtn.addEventListener('click', () => {
+        navMenu.classList.toggle('active');
+        menuBtn.innerHTML = navMenu.classList.contains('active') 
+          ? '<i class="fas fa-times"></i>' 
+          : '<i class="fas fa-bars"></i>';
+      });
+    }
+    
+    // Filter products on main site
+    const filterBtns = document.querySelectorAll('.filter-btn');
+    filterBtns.forEach(btn => {
+      btn.addEventListener('click', () => {
+        filterBtns.forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        displayProducts(btn.getAttribute('data-filter'));
+      });
+    });
+    
+    // Smooth scrolling for anchor links
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+      anchor.addEventListener('click', function(e) {
+        const href = this.getAttribute('href');
+        if (href === '#' || href.startsWith('#!')) return;
         
-        // Make functions available globally
-        window.requestProductQuotation = requestProductQuotation;
-        window.products = products;
-        window.saveProductsToStorage = saveProductsToStorage;
-        window.displayProducts = displayProducts;
-    </script>
+        const targetId = href;
+        const targetElement = document.querySelector(targetId);
+        
+        if (targetElement) {
+          e.preventDefault();
+          
+          // Close mobile menu if open
+          if (navMenu) {
+            navMenu.classList.remove('active');
+            if (menuBtn) {
+              menuBtn.innerHTML = '<i class="fas fa-bars"></i>';
+            }
+          }
+          
+          window.scrollTo({
+            top: targetElement.offsetTop - 80,
+            behavior: 'smooth'
+          });
+        }
+      });
+    });
+  }
+  
+  // Make functions available globally
+  window.requestProductQuotation = requestProductQuotation;
+  window.displayProducts = displayProducts;
+</script>
 </body>
 </html>
