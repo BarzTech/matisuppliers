@@ -1,0 +1,1055 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MATI SUPPLIERS INTERNATIONAL-SMC LTD | Procurement & Supply Chain Solutions</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --green: #008000;
+            --red: #FF0000;
+            --black: #000000;
+            --light-green: #e8f5e9;
+            --light-red: #ffebee;
+            --gray: #333333;
+            --light-gray: #f5f5f5;
+            --white: #ffffff;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            color: var(--black);
+            line-height: 1.6;
+            background-color: var(--white);
+        }
+        
+        /* Header Styles */
+        header {
+            background-color: var(--white);
+            box-shadow: 0 2px 15px rgba(0, 0, 0, 0.1);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            border-bottom: 3px solid var(--red);
+        }
+        
+        .header-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 15px 0;
+        }
+        
+        .logo-img {
+            background: linear-gradient(135deg, var(--green) 0%, var(--black) 100%);
+            color: var(--white);
+            width: 70px;
+            height: 70px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 28px;
+            font-weight: bold;
+            border: 2px solid var(--red);
+        }
+        
+        .logo-text h1 {
+            font-size: 24px;
+            color: var(--green);
+            margin-bottom: 5px;
+        }
+        
+        .logo-text p {
+            font-size: 12px;
+            color: var(--gray);
+        }
+        
+        nav ul {
+            display: flex;
+            list-style: none;
+            gap: 30px;
+        }
+        
+        nav a {
+            text-decoration: none;
+            color: var(--black);
+            font-weight: 600;
+            font-size: 16px;
+            transition: color 0.3s;
+            padding: 5px 0;
+            position: relative;
+        }
+        
+        nav a:hover {
+            color: var(--green);
+        }
+        
+        nav a:after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 3px;
+            background-color: var(--red);
+            bottom: -5px;
+            left: 0;
+            transition: width 0.3s;
+        }
+        
+        nav a:hover:after {
+            width: 100%;
+        }
+        
+        .admin-login-btn {
+            background-color: var(--green);
+            color: var(--white);
+            padding: 10px 20px;
+            border-radius: 5px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s;
+            border: 2px solid var(--green);
+        }
+        
+        .admin-login-btn:hover {
+            background-color: transparent;
+            color: var(--green);
+        }
+        
+        .mobile-menu-btn {
+            display: none;
+            background: none;
+            border: none;
+            font-size: 24px;
+            color: var(--green);
+            cursor: pointer;
+        }
+        
+        /* Hero Section */
+        .hero {
+            background: linear-gradient(rgba(0, 128, 0, 0.9), rgba(0, 0, 0, 0.8)), url('https://images.unsplash.com/photo-1552664730-d307ca884978?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80');
+            background-size: cover;
+            background-position: center;
+            color: var(--white);
+            padding: 100px 0;
+            text-align: center;
+        }
+        
+        .hero-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+        
+        .hero h2 {
+            font-size: 42px;
+            margin-bottom: 20px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+        }
+        
+        .hero p {
+            font-size: 18px;
+            max-width: 700px;
+            margin: 0 auto 30px;
+        }
+        
+        .cta-button {
+            display: inline-block;
+            background-color: var(--red);
+            color: var(--white);
+            padding: 15px 35px;
+            border-radius: 5px;
+            text-decoration: none;
+            font-weight: bold;
+            font-size: 18px;
+            transition: all 0.3s;
+            border: 2px solid var(--red);
+            margin: 0 10px 10px;
+            cursor: pointer;
+        }
+        
+        .cta-button:hover {
+            background-color: transparent;
+            color: var(--white);
+        }
+        
+        /* Sections Common */
+        .section-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 60px 20px;
+        }
+        
+        .section-title {
+            text-align: center;
+            margin-bottom: 50px;
+            position: relative;
+        }
+        
+        .section-title h2 {
+            font-size: 36px;
+            color: var(--green);
+            margin-bottom: 15px;
+            position: relative;
+            display: inline-block;
+        }
+        
+        .section-title h2:after {
+            content: '';
+            position: absolute;
+            width: 70px;
+            height: 4px;
+            background-color: var(--red);
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+        
+        /* Services Section */
+        .services-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 30px;
+        }
+        
+        .service-card {
+            background-color: var(--white);
+            border-radius: 10px;
+            padding: 30px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            transition: transform 0.3s, box-shadow 0.3s;
+            text-align: center;
+            border-top: 4px solid var(--green);
+        }
+        
+        .service-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+        }
+        
+        .service-icon {
+            font-size: 40px;
+            color: var(--green);
+            margin-bottom: 20px;
+        }
+        
+        .service-card h3 {
+            font-size: 22px;
+            margin-bottom: 15px;
+            color: var(--black);
+        }
+        
+        /* Products Section */
+        .products-section {
+            background-color: var(--light-gray);
+        }
+        
+        .products-filter {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 40px;
+        }
+        
+        .filter-btn {
+            padding: 10px 25px;
+            background-color: var(--white);
+            border: 2px solid var(--green);
+            border-radius: 30px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            color: var(--green);
+        }
+        
+        .filter-btn.active, .filter-btn:hover {
+            background-color: var(--green);
+            color: var(--white);
+        }
+        
+        .products-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 30px;
+        }
+        
+        .product-card {
+            background-color: var(--white);
+            border-radius: 10px;
+            overflow: hidden;
+            transition: transform 0.3s;
+            border: 1px solid #e9ecef;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.08);
+        }
+        
+        .product-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        }
+        
+        .product-img {
+            height: 200px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--green);
+            font-size: 50px;
+            background-color: var(--light-green);
+            overflow: hidden;
+            position: relative;
+        }
+        
+        .product-img img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            object-position: center;
+        }
+        
+        .product-img i {
+            font-size: 50px;
+            color: var(--green);
+        }
+        
+        .product-info {
+            padding: 20px;
+        }
+        
+        .product-info h3 {
+            font-size: 20px;
+            margin-bottom: 10px;
+            color: var(--black);
+        }
+        
+        .product-price {
+            font-size: 22px;
+            color: var(--red);
+            font-weight: bold;
+            margin-bottom: 15px;
+        }
+        
+        .product-category {
+            display: inline-block;
+            padding: 5px 10px;
+            background-color: var(--light-green);
+            color: var(--green);
+            border-radius: 3px;
+            font-size: 12px;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+        
+        /* Contact Section */
+        .contact-section {
+            background-color: var(--white);
+        }
+        
+        .contact-container {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 50px;
+            align-items: start;
+        }
+        
+        .contact-info h3 {
+            font-size: 28px;
+            color: var(--green);
+            margin-bottom: 20px;
+        }
+        
+        .contact-details {
+            margin-top: 30px;
+        }
+        
+        .contact-item {
+            display: flex;
+            align-items: flex-start;
+            margin-bottom: 25px;
+            gap: 15px;
+        }
+        
+        .contact-icon {
+            width: 50px;
+            height: 50px;
+            background-color: var(--green);
+            color: var(--white);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            flex-shrink: 0;
+        }
+        
+        .contact-text h4 {
+            font-size: 18px;
+            margin-bottom: 5px;
+            color: var(--black);
+        }
+        
+        /* Footer */
+        footer {
+            background-color: var(--black);
+            color: var(--white);
+            padding-top: 60px;
+        }
+        
+        .footer-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 40px;
+            margin-bottom: 40px;
+        }
+        
+        .footer-column h3 {
+            font-size: 20px;
+            margin-bottom: 25px;
+            color: var(--white);
+            position: relative;
+            padding-bottom: 10px;
+        }
+        
+        .footer-column h3:after {
+            content: '';
+            position: absolute;
+            width: 40px;
+            height: 3px;
+            background-color: var(--red);
+            bottom: 0;
+            left: 0;
+        }
+        
+        .footer-column ul {
+            list-style: none;
+        }
+        
+        .footer-column ul li {
+            margin-bottom: 12px;
+        }
+        
+        .footer-column ul li a {
+            color: #ccc;
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+        
+        .footer-column ul li a:hover {
+            color: var(--white);
+        }
+        
+        .social-icons {
+            display: flex;
+            gap: 15px;
+            margin-top: 15px;
+        }
+        
+        .social-icon {
+            width: 40px;
+            height: 40px;
+            background-color: var(--green);
+            color: var(--white);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+            transition: all 0.3s;
+        }
+        
+        .social-icon:hover {
+            background-color: var(--red);
+            transform: translateY(-3px);
+        }
+        
+        .copyright {
+            text-align: center;
+            padding: 20px;
+            border-top: 1px solid #444;
+            color: #aaa;
+            font-size: 14px;
+            background-color: #111;
+        }
+        
+        /* Responsive Styles */
+        @media (max-width: 992px) {
+            .contact-container {
+                grid-template-columns: 1fr;
+            }
+            
+            .footer-content {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .header-container {
+                flex-direction: column;
+                padding: 10px 20px;
+            }
+            
+            nav ul {
+                flex-direction: column;
+                gap: 15px;
+                display: none;
+                width: 100%;
+                text-align: center;
+                margin-top: 15px;
+            }
+            
+            nav ul.active {
+                display: flex;
+            }
+            
+            .mobile-menu-btn {
+                display: block;
+                position: absolute;
+                top: 25px;
+                right: 20px;
+            }
+            
+            .hero h2 {
+                font-size: 32px;
+            }
+            
+            .hero p {
+                font-size: 16px;
+            }
+            
+            .section-title h2 {
+                font-size: 28px;
+            }
+            
+            .footer-content {
+                grid-template-columns: 1fr;
+            }
+            
+            .services-grid, .products-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        @media (max-width: 576px) {
+            .hero {
+                padding: 70px 0;
+            }
+            
+            .cta-button {
+                display: block;
+                margin: 10px auto;
+                width: 90%;
+                max-width: 300px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header>
+        <div class="header-container">
+            <div class="logo">
+                <div class="logo-img">
+                    <img src="logo.png" alt="MATI SUPPLIERS Logo" style="width: 100%; height: 100%; border-radius: 10px;">
+                </div>
+                <div class="logo-text">
+                    <h1>MATI SUPPLIERS INTERNATIONAL-SMC LTD</h1>
+                    <p>General Merchandise & Procurement Solutions</p>
+                </div>
+            </div>
+            
+            <button class="mobile-menu-btn" id="menuBtn">
+                <i class="fas fa-bars"></i>
+            </button>
+            
+            <nav>
+                <ul id="navMenu">
+                    <li><a href="#home">Home</a></li>
+                    <li><a href="#services">Services</a></li>
+                    <li><a href="#products">Products</a></li>
+                    <li><a href="#contact">Contact</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero" id="home">
+        <div class="hero-content">
+            <h2>Your Trusted Procurement & Supply Chain Partner</h2>
+            <p>MATI SUPPLIERS INTERNATIONAL provides comprehensive general merchandise, procurement and supply chain solutions for businesses across Uganda and beyond.</p>
+            <a href="#products" class="cta-button">View Our Products</a>
+            <a href="#contact" class="cta-button">Get Quotation</a>
+        </div>
+    </section>
+
+    <!-- Services Section -->
+    <section id="services">
+        <div class="section-container">
+            <div class="section-title">
+                <h2>Our Services</h2>
+                <p>Comprehensive solutions for all your procurement needs</p>
+            </div>
+            
+            <div class="services-grid">
+                <div class="service-card">
+                    <div class="service-icon">
+                        <i class="fas fa-laptop"></i>
+                    </div>
+                    <h3>IT Equipment & Accessories</h3>
+                    <p>Printers, computers, CCTV cameras, and all IT accessories from top brands.</p>
+                </div>
+                
+                <div class="service-card">
+                    <div class="service-icon">
+                        <i class="fas fa-user-md"></i>
+                    </div>
+                    <h3>Medical Equipment</h3>
+                    <p>Lab equipment, protective gears, and all medical supplies for healthcare facilities.</p>
+                </div>
+                
+                <div class="service-card">
+                    <div class="service-icon">
+                        <i class="fas fa-graduation-cap"></i>
+                    </div>
+                    <h3>Academic Supplies</h3>
+                    <p>PHD graduation gowns, school uniforms, and all academic procurement needs.</p>
+                </div>
+                
+                <div class="service-card">
+                    <div class="service-icon">
+                        <i class="fas fa-shipping-fast"></i>
+                    </div>
+                    <h3>Import & Export</h3>
+                    <p>Global sourcing and logistics for all your international procurement requirements.</p>
+                </div>
+                
+                <div class="service-card">
+                    <div class="service-icon">
+                        <i class="fas fa-bullhorn"></i>
+                    </div>
+                    <h3>Branding & Advertising</h3>
+                    <p>Complete branding solutions and promotional materials for your business.</p>
+                </div>
+                
+                <div class="service-card">
+                    <div class="service-icon">
+                        <i class="fas fa-shield-alt"></i>
+                    </div>
+                    <h3>Security Equipment</h3>
+                    <p>Security uniforms, safety boots, and all security-related equipment and electronics.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Products Section -->
+    <section class="products-section" id="products">
+        <div class="section-container">
+            <div class="section-title">
+                <h2>Our Products</h2>
+                <p>Quality products at competitive prices in UGX</p>
+            </div>
+            
+            <div class="products-filter">
+                <button class="filter-btn active" data-filter="all">All Products</button>
+                <button class="filter-btn" data-filter="it">IT Equipment</button>
+                <button class="filter-btn" data-filter="medical">Medical</button>
+                <button class="filter-btn" data-filter="security">Security</button>
+                <button class="filter-btn" data-filter="office">Office Supplies</button>
+            </div>
+            
+            <div class="products-grid" id="productsContainer">
+                <!-- Products will be loaded here -->
+            </div>
+        </div>
+    </section>
+
+    <!-- Contact Section -->
+    <section class="contact-section" id="contact">
+        <div class="section-container">
+            <div class="section-title">
+                <h2>Contact Us</h2>
+                <p>Get in touch for quotations and inquiries</p>
+            </div>
+            
+            <div class="contact-container">
+                <div class="contact-info">
+                    <h3>Get Your Quotation Today</h3>
+                    <p>Contact us for pricing and availability of any products or services. Our team is ready to assist you with your procurement needs.</p>
+                    
+                    <div class="contact-details">
+                        <div class="contact-item">
+                            <div class="contact-icon">
+                                <i class="fas fa-map-marker-alt"></i>
+                            </div>
+                            <div class="contact-text">
+                                <h4>Our Location</h4>
+                                <p>Bukoto opposite bukoto heights apartments, Old kira RD, Plot 481-482 moyo close, P.o box 1965 Kampala Uganda.</p>
+                            </div>
+                        </div>
+                        
+                        <div class="contact-item">
+                            <div class="contact-icon">
+                                <i class="fas fa-phone"></i>
+                            </div>
+                            <div class="contact-text">
+                                <h4>Phone Numbers</h4>
+                                <p>Tell: +256 753 402888<br>WhatsApp: 0753402888</p>
+                            </div>
+                        </div>
+                        
+                        <div class="contact-item">
+                            <div class="contact-icon">
+                                <i class="fas fa-envelope"></i>
+                            </div>
+                            <div class="contact-text">
+                                <h4>Email Address</h4>
+                                <p>matisuppliers.inter@gmail.com</p>
+                            </div>
+                        </div>
+                        
+                        <div class="contact-item">
+                            <div class="contact-icon">
+                                <i class="fab fa-facebook"></i>
+                            </div>
+                            <div class="contact-text">
+                                <h4>Facebook</h4>
+                                <p>MatiSuppliers</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <div class="footer-content">
+            <div class="footer-column">
+                <h3>MATI SUPPLIERS INTERNATIONAL-SMC LTD</h3>
+                <p>Your trusted partner in procurement and supply chain solutions across Uganda and beyond.</p>
+                <div class="social-icons">
+                    <a href="https://www.facebook.com/MatiSuppliers" class="social-icon">
+                        <i class="fab fa-facebook-f"></i>
+                    </a>
+                    <a href="https://wa.me/256753402888" class="social-icon">
+                        <i class="fab fa-whatsapp"></i>
+                    </a>
+                    <a href="mailto:matisuppliers.inter@gmail.com" class="social-icon">
+                        <i class="fas fa-envelope"></i>
+                    </a>
+                </div>
+            </div>
+            
+            <div class="footer-column">
+                <h3>Quick Links</h3>
+                <ul>
+                    <li><a href="#home">Home</a></li>
+                    <li><a href="#services">Services</a></li>
+                    <li><a href="#products">Products</a></li>
+                    <li><a href="#contact">Contact</a></li>
+                </ul>
+            </div>
+            
+            <div class="footer-column">
+                <h3>Our Services</h3>
+                <ul>
+                    <li><a href="#services">IT Equipment</a></li>
+                    <li><a href="#services">Medical Supplies</a></li>
+                    <li><a href="#services">Security Equipment</a></li>
+                    <li><a href="#services">Import & Export</a></li>
+                </ul>
+            </div>
+            
+            <div class="footer-column">
+                <h3>Contact Info</h3>
+                <ul>
+                    <li><i class="fas fa-map-marker-alt"></i> Bukoto, Kampala</li>
+                    <li><i class="fas fa-phone"></i> +256 753 402888</li>
+                    <li><i class="fas fa-envelope"></i> matisuppliers.inter@gmail.com</li>
+                </ul>
+            </div>
+        </div>
+        
+        <div class="copyright">
+            <p>&copy; 2026 MATI SUPPLIERS INTERNATIONAL-SMC LTD. All rights reserved. | Developed and run by <a href="https://wa.me/256707805112" target="_blank">
+    #sitesbybarz
+</a></p>
+        </div>
+    </footer>
+
+    <script>
+  // ================= SUPABASE SETUP =================
+  // REPLACE THESE WITH YOUR ACTUAL VALUES!
+  const SUPABASE_URL = 'https://dwhjnlawfsacdhpllres.supabase.co';  // Your Project URL
+  const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImR3aGpubGF3ZnNhY2RocGxscmVzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzAzOTk2MzcsImV4cCI6MjA4NTk3NTYzN30.6t0bAZK305R1Kf1BkF3UxUG6cppgQZuz0Ucg1iQkJZY';  // Your anon key
+  
+  // Initialize Supabase
+  const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+  
+  // Global products array (will be loaded from Supabase)
+  let products = [];
+  
+  // ================= WEBSITE INITIALIZATION =================
+  document.addEventListener('DOMContentLoaded', async function() {
+    // Load products from Supabase database
+    await loadProductsFromDatabase();
+    
+    // Display products
+    displayProducts();
+    
+    // Setup event listeners
+    setupEventListeners();
+  });
+  
+  // ================= LOAD PRODUCTS FROM SUPABASE =================
+  async function loadProductsFromDatabase() {
+    try {
+      console.log('Loading products from Supabase...');
+      
+      const { data, error } = await supabase
+        .from('products')
+        .select('*')
+        .eq('status', 'active')
+        .order('created_at', { ascending: false });
+      
+      if (error) {
+        console.error('Supabase error:', error);
+        throw error;
+      }
+      
+      console.log('Products loaded:', data?.length || 0);
+      products = data || [];
+      
+    } catch (error) {
+      console.error('Error loading products:', error);
+      // Fallback to localStorage if Supabase fails
+      const localProducts = JSON.parse(localStorage.getItem('matiProducts')) || [];
+      products = localProducts;
+    }
+  }
+  
+  // ================= DISPLAY PRODUCTS =================
+  // KEEP YOUR EXISTING displayProducts() function
+  // It should use the global 'products' array
+  
+  // ================= EVENT LISTENERS =================
+  // KEEP YOUR EXISTING setupEventListeners() function
+  
+  // ================= MAKE FUNCTIONS GLOBAL =================
+  window.requestProductQuotation = requestProductQuotation;
+  window.displayProducts = displayProducts;
+        
+        // Save products to localStorage
+        function saveProductsToStorage() {
+            localStorage.setItem('matiProducts', JSON.stringify(products));
+        }
+        
+        // Initialize the website
+        document.addEventListener('DOMContentLoaded', function() {
+            // Load products on main site
+            displayProducts();
+            
+            // Set up event listeners
+            setupEventListeners();
+            
+            // Save initial products to localStorage if empty
+            if (!localStorage.getItem('matiProducts')) {
+                saveProductsToStorage();
+            }
+        });
+        
+        function setupEventListeners() {
+            // Mobile menu toggle
+            const menuBtn = document.getElementById('menuBtn');
+            const navMenu = document.getElementById('navMenu');
+            
+            if (menuBtn && navMenu) {
+                menuBtn.addEventListener('click', () => {
+                    navMenu.classList.toggle('active');
+                    menuBtn.innerHTML = navMenu.classList.contains('active') 
+                        ? '<i class="fas fa-times"></i>' 
+                        : '<i class="fas fa-bars"></i>';
+                });
+            }
+            
+            // Filter products on main site
+            const filterBtns = document.querySelectorAll('.filter-btn');
+            filterBtns.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    filterBtns.forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    displayProducts(btn.getAttribute('data-filter'));
+                });
+            });
+            
+            // Smooth scrolling for anchor links
+            document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+                anchor.addEventListener('click', function(e) {
+                    const href = this.getAttribute('href');
+                    if (href === '#' || href.startsWith('#!')) return;
+                    
+                    const targetId = href;
+                    const targetElement = document.querySelector(targetId);
+                    
+                    if (targetElement) {
+                        e.preventDefault();
+                        
+                        // Close mobile menu if open
+                        if (navMenu) {
+                            navMenu.classList.remove('active');
+                            if (menuBtn) {
+                                menuBtn.innerHTML = '<i class="fas fa-bars"></i>';
+                            }
+                        }
+                        
+                        window.scrollTo({
+                            top: targetElement.offsetTop - 80,
+                            behavior: 'smooth'
+                        });
+                    }
+                });
+            });
+        }
+        
+        function displayProducts(filter = 'all') {
+            const productsContainer = document.getElementById('productsContainer');
+            if (!productsContainer) return;
+            
+            productsContainer.innerHTML = '';
+            
+            // Filter products
+            const filteredProducts = filter === 'all' 
+                ? products.filter(p => p.status === 'active')
+                : products.filter(p => p.category === filter && p.status === 'active');
+            
+            if (filteredProducts.length === 0) {
+                productsContainer.innerHTML = '<p style="text-align: center; grid-column: 1/-1; padding: 40px; color: var(--gray);">No products found in this category.</p>';
+                return;
+            }
+            
+            // Category names mapping
+            const categoryNames = {
+                'it': 'IT Equipment',
+                'medical': 'Medical Equipment',
+                'security': 'Security Equipment',
+                'office': 'Office Supplies',
+                'academic': 'Academic Supplies',
+                'branding': 'Branding & Advertising',
+                'other': 'Other'
+            };
+            
+            filteredProducts.forEach(product => {
+                const productCard = document.createElement('div');
+                productCard.className = 'product-card';
+                
+                // Get category name
+                const categoryName = categoryNames[product.category] || 'Unknown';
+                
+                // Format price in UGX with commas
+                const formattedPrice = product.price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+                
+                // SMART IMAGE HANDLING FOR ALL FORMATS:
+                let imageContent = '';
+                const imageData = product.image;
+                
+                // Case 1: Base64 image stored in localStorage
+                if (imageData && imageData.startsWith('mati_product_image_')) {
+                    const base64Image = localStorage.getItem(imageData);
+                    if (base64Image) {
+                        imageContent = `<img src="${base64Image}" alt="${product.name}">`;
+                    } else {
+                        // Fallback if base64 not found
+                        imageContent = getFallbackIcon(product.category);
+                    }
+                }
+                // Case 2: External URL or uploaded file path
+                else if (imageData && (imageData.startsWith('http') || imageData.includes('.jpg') || imageData.includes('.png') || imageData.includes('.jpeg'))) {
+                    imageContent = `<img src="${imageData}" alt="${product.name}">`;
+                }
+                // Case 3: Font Awesome icon (old format)
+                else if (imageData && imageData.startsWith('fas fa-')) {
+                    imageContent = `<i class="${imageData}"></i>`;
+                }
+                // Case 4: No image data - use category-based icon
+                else {
+                    imageContent = getFallbackIcon(product.category);
+                }
+                
+                productCard.innerHTML = `
+                    <div class="product-img">
+                        ${imageContent}
+                    </div>
+                    <div class="product-info">
+                        <span class="product-category">${categoryName}</span>
+                        <h3>${product.name}</h3>
+                        <p>${product.description.substring(0, 80)}${product.description.length > 80 ? '...' : ''}</p>
+                        <div class="product-price">UGX ${formattedPrice}</div>
+                        <button class="cta-button" onclick="requestProductQuotation(${product.id})" style="padding: 10px 20px; font-size: 14px; width: 100%;">
+                            <i class="fas fa-quote-right"></i> Request Quote
+                        </button>
+                    </div>
+                `;
+                
+                productsContainer.appendChild(productCard);
+            });
+        }
+        
+        // Helper function for fallback icons
+        function getFallbackIcon(category) {
+            const icons = {
+                'it': 'fas fa-laptop',
+                'medical': 'fas fa-user-md',
+                'security': 'fas fa-shield-alt',
+                'office': 'fas fa-chair',
+                'academic': 'fas fa-graduation-cap',
+                'branding': 'fas fa-bullhorn',
+                'other': 'fas fa-box'
+            };
+            const iconClass = icons[category] || 'fas fa-box';
+            return `<i class="${iconClass}"></i>`;
+        }
+        
+        function requestProductQuotation(productId) {
+    const product = products.find(p => p.id === productId);
+    if (!product) return;
+
+    const message = `Hello MATI SUPPLIERS,%0A%0AI'm interested in the following product:%0A%0A` +
+        `Product: ${product.name}%0A` +
+        `Category: ${product.category}%0A` +
+        `Price: UGX ${product.price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")}%0A%0A` +
+        `Please send me a quotation.`;
+
+    const phone = "256753402888"; // your WhatsApp number
+    window.open(`https://wa.me/${phone}?text=${message}`, "_blank");
+}
+
+        
+        // Make functions available globally
+        window.requestProductQuotation = requestProductQuotation;
+        window.products = products;
+        window.saveProductsToStorage = saveProductsToStorage;
+        window.displayProducts = displayProducts;
+    </script>
+</body>
+</html>
