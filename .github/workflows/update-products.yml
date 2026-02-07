@@ -1,14 +1,9 @@
 name: Update Products from Google Sheets
 
 on:
-  # Run automatically every 6 hours
   schedule:
-    - cron: '*/30 * * * *'
-  
-  # Run manually from GitHub UI
+    - cron: '*/30 * * * *'  # Every 30 minutes
   workflow_dispatch:
-  
-  # Run when Google Sheets script is updated
   push:
     paths:
       - 'generate-products.js'
@@ -18,87 +13,89 @@ jobs:
   update-products:
     runs-on: ubuntu-latest
     permissions:
-      contents: write  # This allows the action to push changes
+      contents: write
     
     steps:
-    # Step 1: Checkout the repository
+    # Step 1: Get the code
     - name: Checkout repository
       uses: actions/checkout@v4
-      with:
-        token: ${{ secrets.GITHUB_TOKEN }}
     
-    # Step 2: Setup Node.js
+    # Step 2: Setup Node.js (FIXED - removed cache)
     - name: Setup Node.js
       uses: actions/setup-node@v4
       with:
         node-version: '18'
-        cache: 'npm'
+        # REMOVED cache line since no dependencies
     
-    # Step 3: Install dependencies (if any)
-    - name: Install dependencies
+    # Step 3: Create package.json if missing
+    - name: Create package.json
       run: |
-        # Create a simple package.json if it doesn't exist
         if [ ! -f package.json ]; then
-          echo '{"name":"mati-suppliers","version":"1.0.0","private":true}' > package.json
+          echo '{
+            "name": "mati-suppliers",
+            "version": "1.0.0",
+            "description": "MATI SUPPLIERS website",
+            "main": "generate-products.js",
+            "scripts": {
+              "generate": "node generate-products.js"
+            },
+            "keywords": ["suppliers", "procurement"],
+            "author": "MATI SUPPLIERS",
+            "license": "MIT"
+          }' > package.json
+          echo "✅ Created package.json"
+        else
+          echo "📦 package.json already exists"
         fi
     
-    # Step 4: Run the Google Sheets script
-    - name: Generate products.json
+    # Step 4: Generate products from Google Sheets
+    - name: Generate products
       run: |
+        echo "========================================"
+        echo "🔄 UPDATING PRODUCTS FROM GOOGLE SHEETS"
+        echo "========================================"
+        echo "⏰ Started at: $(date)"
+        echo ""
+        
+        # Run the Google Sheets script
         node generate-products.js
         
-        # Show what was generated
-        echo "=== Generated products.json ==="
-        head -20 products.json
-        
-        echo "=== Generated products.js ==="
-        head -10 products.js
-        
-        # Count products
-        PRODUCT_COUNT=$(node -e "const data = require('./products.json'); console.log(data.products.length)")
-        echo "📦 Products generated: $PRODUCT_COUNT"
+        # Show results
+        echo ""
+        echo "📋 UPDATE RESULTS:"
+        if [ -f products.json ]; then
+          PRODUCT_COUNT=$(node -e "try { const data = require('./products.json'); console.log(data.products?.length || 0) } catch(e) { console.log(0) }")
+          echo "✅ Products loaded: $PRODUCT_COUNT"
+        fi
     
-    # Step 5: Commit and push changes if there are any
-    - name: Commit and push changes
+    # Step 5: Commit and push changes
+    - name: Commit changes
       run: |
         # Configure git
         git config --local user.email "github-actions[bot]@users.noreply.github.com"
         git config --local user.name "GitHub Actions Bot"
         
-        # Check if there are any changes
+        # Add product files
         git add products.json products.js
         
-        # Check if there are changes to commit
+        # Check if there are changes
         if git diff --quiet && git diff --staged --quiet; then
-          echo "✅ No changes to commit. Products are up to date."
+          echo "✅ No changes - Google Sheets data unchanged"
         else
-          # Commit the changes
-          git commit -m "🔄 Auto-update products from Google Sheets [$(date +'%Y-%m-%d %H:%M')]"
-          
-          # Push changes
+          # Create commit message
+          TIMESTAMP=$(date +'%Y-%m-%d %H:%M:%S')
+          git commit -m "🔄 Auto-update products [$TIMESTAMP]"
           git push
-          echo "✅ Successfully updated products and pushed to repository."
+          echo "✅ Successfully updated and pushed changes"
         fi
     
-    # Step 6: Output success message
-    - name: Success Notification
-      if: success()
+    # Step 6: Final status
+    - name: Update Status
       run: |
-        echo "🎉 Products updated successfully!"
-        echo "📊 Products will be live on the website in a few minutes."
-        echo "⏰ Next auto-update in 6 hours."
         echo ""
-        echo "To manually trigger update:"
-        echo "1. Go to GitHub Repository → Actions"
-        echo "2. Click 'Update Products from Google Sheets'"
-        echo "3. Click 'Run workflow' → 'Run workflow'"
-    
-    # Step 7: Error handling
-    - name: Error Notification
-      if: failure()
-      run: |
-        echo "❌ Failed to update products from Google Sheets"
-        echo "Please check:"
-        echo "1. Google Sheet is publicly accessible"
-        echo "2. generate-products.js has correct Sheet ID"
-        echo "3. GitHub Actions permissions are set"
+        echo "========================================"
+        echo "🎉 PRODUCTS UPDATE COMPLETE"
+        echo "========================================"
+        echo "⏰ Next auto-update: 30 minutes"
+        echo "📅 Manual trigger: Go to Actions → Run workflow"
+        echo "========================================"
