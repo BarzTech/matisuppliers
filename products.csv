@@ -13,31 +13,31 @@ ID,Name,Category,Price,Description,Image,Status,Stock
 12,Security Rain Coats Executive,Security,350000,Executive rain coat,,active,15
 13,Security Handle Metal Detectors,Security,150000,Handheld metal detectors,https://i.ibb.co/Vcgf4dfh/Whats-App-Image-2026-02-07-at-08-12-54-1.jpg,active,20
 14,Security Walk Through Detectors,Security,15000000,Walk through metal detectors,https://i.ibb.co/Rpv68b2F/KAPI-DEDEKTORU-scaled.jpg,active,5
-15,Digitalizing Company Logs,IT Equipment,100000,Company log digitalization service,https://i.ibb.co/RTjJRcLN/lod4.jpg,active,999
+15,Digitalizing Company Logs,it,100000,Company log digitalization service,https://i.ibb.co/RTjJRcLN/lod4.jpg,active,999
 16,Security Colored Cameras,Security,150000,Color security cameras,https://i.ibb.co/tw0c1h84/cctv-package-2-dec-2025-652.jpg,active,25
 17,Camera Installation Full Package,Security,2500000,Complete camera installation package,https://i.ibb.co/7tk9tZvD/Whats-App-Image-2026-02-07-at-17-52-28.jpg,active,10
-18,Office Executive Chairs,Office Supplies,800000,Executive office chairs,https://i.ibb.co/XxpTfwrQ/Whats-App-Image-2026-02-07-at-16-57-20.jpg,active,15
-19,Visitors Boardroom Chairs,Office Supplies,500000,Visitors and boardroom chairs,https://i.ibb.co/Tqk9rYFV/Whats-App-Image-2026-02-07-at-16-30-16.jpg,active,20
-20,Reception Chairs 3 Seaters,Office Supplies,700000,3-seater reception chairs,https://i.ibb.co/8DQnQj81/610-Lo16tq-VL-AC-UF894-1000-QL80.jpg,active,12
-21,Office Executive Tables,Office Supplies,2000000,Executive office tables,https://i.ibb.co/fGzbXd16/Whats-App-Image-2026-02-07-at-16-28-35.jpg,active,8
-22,Office Cabin,Office Supplies,800000,Office cabin furniture,https://i.ibb.co/d0QpbdVL/4-drawer-filing-cabinet-Oak-3-scaled-500x500.jpg,active,10
-23,Desktop Computer All in One 12th Gen,IT Equipment,3500000,All-in-one desktop computer 12th generation,https://i.ibb.co/8LhjHScg/Whats-App-Image-2026-02-07-at-17-46-47.jpg,active,7
-24,Laptop Basic 12th Gen,IT Equipment,1500000,Basic laptop 12th generation,https://i.ibb.co/9HSrfgY2/Whats-App-Image-2026-02-07-at-17-34-35.jpg,active,12
-25,Laptop Mid-Range 12th Gen,IT Equipment,2000000,Mid-range laptop 12th generation,,active,10
-26,Laptop Premium 12th Gen,IT Equipment,3000000,Premium laptop 12th generation,,active,6
-27,Laptop Executive 12th Gen,IT Equipment,4000000,Executive laptop 12th generation,,active,4
-28,Commercial Printer Basic,IT Equipment,5000000,Basic commercial printer,,active,5
-29,Commercial Printer Mid-Range,IT Equipment,7000000,Mid-range commercial printer,,active,4
-30,Commercial Printer Premium,IT Equipment,10000000,Premium commercial printer,,active,3
-31,Commercial Printer Executive,IT Equipment,15000000,Executive commercial printer,https://i.ibb.co/fzVHqsyh/Whats-App-Image-2026-02-07-at-17-30-22.jpg,active,2
-32,Colored Printer Basic,IT Equipment,1500000,Basic colored printer,,active,8
-33,Colored Printer Mid-Range,IT Equipment,2000000,Mid-range colored printer,,active,6
-34,Colored Printer Premium,IT Equipment,3000000,Premium colored printer,,active,4
-35,Colored Printer Executive,IT Equipment,5000000,Executive colored printer,,active,3
-36,Copier Printer,IT Equipment,1500000,Photocopier printer,,active,7
-37,Toner Cartridge Basic,IT Equipment,150000,Basic toner cartridge,,active,50
-38,Toner Cartridge Mid-Range,IT Equipment,250000,Mid-range toner cartridge,,active,30
-39,Toner Cartridge Original,IT Equipment,500000,Original toner cartridge,https://i.ibb.co/23cVYThK/Whats-App-Image-2026-02-07-at-17-48-49.jpg,active,20
+18,Office Executive Chairs,office,800000,Executive office chairs,https://i.ibb.co/XxpTfwrQ/Whats-App-Image-2026-02-07-at-16-57-20.jpg,active,15
+19,Visitors Boardroom Chairs,office,500000,Visitors and boardroom chairs,https://i.ibb.co/Tqk9rYFV/Whats-App-Image-2026-02-07-at-16-30-16.jpg,active,20
+20,Reception Chairs 3 Seaters,office,700000,3-seater reception chairs,https://i.ibb.co/8DQnQj81/610-Lo16tq-VL-AC-UF894-1000-QL80.jpg,active,12
+21,Office Executive Tables,office,2000000,Executive office tables,https://i.ibb.co/fGzbXd16/Whats-App-Image-2026-02-07-at-16-28-35.jpg,active,8
+22,Office Cabin,office,800000,Office cabin furniture,https://i.ibb.co/d0QpbdVL/4-drawer-filing-cabinet-Oak-3-scaled-500x500.jpg,active,10
+23,Desktop Computer All in One 12th Gen,it,3500000,All-in-one desktop computer 12th generation,https://i.ibb.co/8LhjHScg/Whats-App-Image-2026-02-07-at-17-46-47.jpg,active,7
+24,Laptop Basic 12th Gen,it,1500000,Basic laptop 12th generation,https://i.ibb.co/9HSrfgY2/Whats-App-Image-2026-02-07-at-17-34-35.jpg,active,12
+25,Laptop Mid-Range 12th Gen,it,2000000,Mid-range laptop 12th generation,,active,10
+26,Laptop Premium 12th Gen,it,3000000,Premium laptop 12th generation,,active,6
+27,Laptop Executive 12th Gen,it,4000000,Executive laptop 12th generation,,active,4
+28,Commercial Printer Basic,it,5000000,Basic commercial printer,,active,5
+29,Commercial Printer Mid-Range,it,7000000,Mid-range commercial printer,,active,4
+30,Commercial Printer Premium,it,10000000,Premium commercial printer,,active,3
+31,Commercial Printer Executive,it,15000000,Executive commercial printer,https://i.ibb.co/fzVHqsyh/Whats-App-Image-2026-02-07-at-17-30-22.jpg,active,2
+32,Colored Printer Basic,it,1500000,Basic colored printer,,active,8
+33,Colored Printer Mid-Range,it,2000000,Mid-range colored printer,,active,6
+34,Colored Printer Premium,it,3000000,Premium colored printer,,active,4
+35,Colored Printer Executive,it,5000000,Executive colored printer,,active,3
+36,Copier Printer,it,1500000,Photocopier printer,,active,7
+37,Toner Cartridge Basic,it,150000,Basic toner cartridge,,active,50
+38,Toner Cartridge Mid-Range,it,250000,Mid-range toner cartridge,,active,30
+39,Toner Cartridge Original,it,500000,Original toner cartridge,https://i.ibb.co/23cVYThK/Whats-App-Image-2026-02-07-at-17-48-49.jpg,active,20
 40,PHD Graduation Gown Full Set,Branding,500000,Complete PHD graduation gown set,https://i.ibb.co/S4RcGmzX/Whats-App-Image-2026-02-07-at-16-43-34.jpg,active,25
 41,Master's Degree Gowns Full Set,Branding,350000,Complete Master's degree gown set,https://i.ibb.co/ds7gWRVK/Whats-App-Image-2026-02-07-at-16-45-47.jpg,active,30
 42,Degree Graduation Gown Full Set,Branding,150000,Complete Degree graduation gown set,https://i.ibb.co/HT4nfTBp/Whats-App-Image-2026-02-07-at-17-33-28.jpg,active,50
