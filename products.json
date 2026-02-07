@@ -1,0 +1,94 @@
+{
+  "products": [
+    {
+      "id": 1,
+      "name": "Unnamed Product",
+      "category": "other",
+      "price": 0,
+      "description": "",
+      "image": "",
+      "status": "active",
+      "stock": 0
+    },
+    {
+      "id": 2,
+      "name": "Unnamed Product",
+      "category": "other",
+      "price": 0,
+      "description": "",
+      "image": "",
+      "status": "active",
+      "stock": 0
+    },
+    {
+      "id": 3,
+      "name": "Unnamed Product",
+      "category": "other",
+      "price": 0,
+      "description": "",
+      "image": "",
+      "status": "active",
+      "stock": 0
+    },
+    {
+      "id": 4,
+      "name": "Unnamed Product",
+      "category": "other",
+      "price": 0,
+      "description": "",
+      "image": "",
+      "status": "active",
+      "stock": 0
+    },
+    {
+      "id": 5,
+      "name": "Unnamed Product",
+      "category": "other",
+      "price": 0,
+      "description": "",
+      "image": "",
+      "status": "active",
+      "stock": 0
+    },
+    {
+      "id": 6,
+      "name": "Unnamed Product",
+      "category": "other",
+      "price": 0,
+      "description": "",
+      "image": "",
+      "status": "active",
+      "stock": 0
+    },
+    {
+      "id": 7,
+      "name": "Unnamed Product",
+      "category": "other",
+      "price": 0,
+      "description": "",
+      "image": "",
+      "status": "active",
+      "stock": 0
+    },
+    {
+      "id": 8,
+      "name": "Unnamed Product",
+      "category": "other",
+      "price": 0,
+      "description": "",
+      "image": "",
+      "status": "active",
+      "stock": 0
+    },
+    {
+      "id": 9,
+      "name": "Unnamed Product",
+      "category": "other",
+      "price": 0,
+      "description": "",
+      "image": "",
+      "status": "active",
+      "stock": 0
+    }
+  ]
+}
