@@ -1,0 +1,14 @@
+name: Auto Update Products (Daily)
+
+on:
+  schedule:
+    - cron: '0 18 * * *'  # 18:00 UTC
+  workflow_dispatch:
+
+jobs:
+  call-auto-update:
+    uses: BarzTech/matisuppliers/.github/workflows/auto-update-products-reusable.yml@main
+    secrets: inherit
+    with:
+      node_version: '18'
+      script_path: 'generate-products.js'
