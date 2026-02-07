@@ -1,9 +1,14 @@
 name: Update Products from Google Sheets
 
 on:
+  # Auto-update every 30 minutes
   schedule:
-    - cron: '*/30 * * * *'  # Every 30 minutes
+    - cron: '*/30 * * * *'
+  
+  # Manual trigger from GitHub UI
   workflow_dispatch:
+  
+  # Auto-run when script changes
   push:
     paths:
       - 'generate-products.js'
@@ -16,86 +21,114 @@ jobs:
       contents: write
     
     steps:
-    # Step 1: Get the code
-    - name: Checkout repository
+    # ================= STEP 1: GET LATEST CODE =================
+    - name: Checkout with full history
       uses: actions/checkout@v4
+      with:
+        token: ${{ secrets.GITHUB_TOKEN }}
+        fetch-depth: 0  # Get ALL history to avoid conflicts
     
-    # Step 2: Setup Node.js (FIXED - removed cache)
+    # ================= STEP 2: SETUP NODE =================
     - name: Setup Node.js
       uses: actions/setup-node@v4
       with:
         node-version: '18'
-        # REMOVED cache line since no dependencies
     
-    # Step 3: Create package.json if missing
-    - name: Create package.json
+    # ================= STEP 3: SYNC WITH REMOTE =================
+    - name: Sync with remote repository
       run: |
-        if [ ! -f package.json ]; then
-          echo '{
-            "name": "mati-suppliers",
-            "version": "1.0.0",
-            "description": "MATI SUPPLIERS website",
-            "main": "generate-products.js",
-            "scripts": {
-              "generate": "node generate-products.js"
-            },
-            "keywords": ["suppliers", "procurement"],
-            "author": "MATI SUPPLIERS",
-            "license": "MIT"
-          }' > package.json
-          echo "✅ Created package.json"
-        else
-          echo "📦 package.json already exists"
-        fi
-    
-    # Step 4: Generate products from Google Sheets
-    - name: Generate products
-      run: |
-        echo "========================================"
-        echo "🔄 UPDATING PRODUCTS FROM GOOGLE SHEETS"
-        echo "========================================"
-        echo "⏰ Started at: $(date)"
-        echo ""
+        echo "🔄 Syncing with GitHub..."
+        git config --global user.name "GitHub Actions"
+        git config --global user.email "actions@github.com"
         
-        # Run the Google Sheets script
+        # Fetch ALL branches and history
+        git fetch --all --depth=100
+        
+        # Reset to match remote exactly
+        git reset --hard origin/main
+        
+        # Clean any untracked files
+        git clean -fd
+        
+        echo "✅ Synced with remote repository"
+    
+    # ================= STEP 4: GENERATE PRODUCTS =================
+    - name: Generate products from Google Sheets
+      run: |
+        echo "========================================"
+        echo "📦 GENERATING PRODUCTS"
+        echo "========================================"
+        echo "⏰ Time: $(date)"
+        
+        # Run the generation script
         node generate-products.js
         
         # Show results
-        echo ""
-        echo "📋 UPDATE RESULTS:"
         if [ -f products.json ]; then
-          PRODUCT_COUNT=$(node -e "try { const data = require('./products.json'); console.log(data.products?.length || 0) } catch(e) { console.log(0) }")
-          echo "✅ Products loaded: $PRODUCT_COUNT"
+          PRODUCT_COUNT=$(node -e "try { 
+            const data = require('./products.json'); 
+            console.log(data.products?.length || 0) 
+          } catch(e) { 
+            console.log(0) 
+          }")
+          
+          if [ "$PRODUCT_COUNT" -gt 0 ]; then
+            echo "✅ Success! Generated $PRODUCT_COUNT products"
+            echo "🕒 Last updated: $(node -e "const d = require('./products.json'); console.log(d.meta?.lastUpdated || 'Unknown')")"
+          else
+            echo "⚠️ Generated 0 products (Google Sheet might be empty)"
+          fi
+        else
+          echo "❌ Failed to generate products.json"
         fi
     
-    # Step 5: Commit and push changes
-    - name: Commit changes
+    # ================= STEP 5: COMMIT & PUSH =================
+    - name: Commit and push changes
       run: |
-        # Configure git
-        git config --local user.email "github-actions[bot]@users.noreply.github.com"
-        git config --local user.name "GitHub Actions Bot"
+        echo "📝 Checking for changes..."
         
-        # Add product files
+        # Check if product files actually changed
+        CHANGED_FILES=$(git status --porcelain | grep -E 'products\.(json|js)' || true)
+        
+        if [ -z "$CHANGED_FILES" ]; then
+          echo "✅ No changes in product files"
+          echo "⏭️ Skipping commit"
+          exit 0
+        fi
+        
+        echo "📄 Changed files:"
+        echo "$CHANGED_FILES"
+        
+        # Configure git
+        git config --global user.name "MATI SUPPLIERS Auto-Update"
+        git config --global user.email "mati-suppliers@users.noreply.github.com"
+        
+        # Add ONLY product files
         git add products.json products.js
         
-        # Check if there are changes
-        if git diff --quiet && git diff --staged --quiet; then
-          echo "✅ No changes - Google Sheets data unchanged"
-        else
-          # Create commit message
-          TIMESTAMP=$(date +'%Y-%m-%d %H:%M:%S')
-          git commit -m "🔄 Auto-update products [$TIMESTAMP]"
-          git push
-          echo "✅ Successfully updated and pushed changes"
-        fi
+        # Create commit message with timestamp
+        TIMESTAMP=$(date +'%Y-%m-%d %H:%M:%S')
+        COMMIT_MSG="🔄 Auto-update products [$TIMESTAMP]"
+        
+        # Commit
+        git commit -m "$COMMIT_MSG"
+        
+        # PUSH WITH FORCE TO AVOID CONFLICTS
+        echo "📤 Pushing to GitHub..."
+        git push origin main --force-with-lease
+        
+        echo "✅ Successfully updated products!"
     
-    # Step 6: Final status
-    - name: Update Status
+    # ================= STEP 6: FINAL STATUS =================
+    - name: Completion Status
       run: |
         echo ""
         echo "========================================"
-        echo "🎉 PRODUCTS UPDATE COMPLETE"
+        echo "🎉 AUTO-UPDATE COMPLETE"
         echo "========================================"
-        echo "⏰ Next auto-update: 30 minutes"
-        echo "📅 Manual trigger: Go to Actions → Run workflow"
+        echo "📊 Repository: BarzTech/matisuppliers"
+        echo "⏰ Next update: 30 minutes"
+        echo "🔧 Manual trigger: Actions → 'Update Products' → Run workflow"
+        echo "🌐 Live website: https://barztech.github.io/matisuppliers/"
+        echo "📧 Support: matisuppliers.inter@gmail.com"
         echo "========================================"
