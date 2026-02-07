@@ -1,8 +1,51 @@
-id,name,category,price,description,image,status,stock
+ID,Name,Category,Price,Description,Image,Status,Stock
 1,Security Uniforms,Security,150000,For all sizes,https://i.ibb.co/MTzqjxL/Whats-App-Image-2026-02-07-at-08-09-44-1.jpg,active,100
-2,Security Uniforms,Security,150000,For all sizes,https://i.ibb.co/20qp6kK8/Whats-App-Image-2026-02-07-at-08-09-43-1.jpg,active,100
-3,Security Uniforms,Security,150000,For all sizes,https://i.ibb.co/rfTK4HMt/Whats-App-Image-2026-02-07-at-08-09-42.jpg,active,100
-4,Security Boots,Security,120000,For all sizes,https://i.ibb.co/xt3gLz4V/Whats-App-Image-2026-02-07-at-08-08-03.jpg,active,100
-5,Security Belts,Security,25000,Strong material,https://i.ibb.co/jvz8Y9Px/Whats-App-Image-2026-02-07-at-08-08-01.jpg,active,100
-6,"Security Walkie Talkie radios pair",Security,250000,"Long Range and Quality tested",https://i.ibb.co/sM9z8Tt/Whats-App-Image-2026-02-07-at-08-07-59.jpg,active,100
-7,"Security Car searching mirrors",Security,350000,Wide mirrors,,active,100
+2,Security Boots,Security,120000,For all sizes,https://i.ibb.co/NnNdDgLY/Whats-App-Image-2026-02-07-at-16-50-38.jpg,active,100
+3,Security Belts,Security,25000,Strong material,https://i.ibb.co/DfGHF7BS/Whats-App-Image-2026-02-07-at-17-35-28.jpg,active,100
+4,Security Walkie Talkie Radios Pair,Security,250000,Long Range and Quality tested,https://i.ibb.co/sM9z8Tt/Whats-App-Image-2026-02-07-at-08-07-59.jpg,active,50
+5,Security Car Searching Mirrors,Security,350000,Wide mirrors,https://i.ibb.co/NdTXSgWr/Whats-App-Image-2026-02-07-at-17-54-30.jpg,active,30
+6,Security Batons Plastic,Security,50000,Plastic security batons,https://i.ibb.co/hFfhTScV/Whats-App-Image-2026-02-07-at-16-53-32.jpg,active,75
+7,Security Lanyards,Security,20000,Security identification lanyards,https://i.ibb.co/YTbqy52v/611-Ol6-Rxu0-L-AC-SL1500.jpg,active,200
+8,Security Hand Cuffs,Security,150000,Professional hand cuffs,https://i.ibb.co/Dg6vmQ1G/Whats-App-Image-2026-02-07-at-08-12-56.jpg,active,40
+9,Security Rain Coats,Security,100000,Basic rain coat,https://i.ibb.co/x8X0Gv0L/Whats-App-Image-2026-02-07-at-17-50-33.jpg,active,60
+10,Security Rain Coats Premium,Security,150000,Premium rain coat,,active,40
+11,Security Rain Coats Deluxe,Security,250000,Deluxe rain coat,,active,25
+12,Security Rain Coats Executive,Security,350000,Executive rain coat,,active,15
+13,Security Handle Metal Detectors,Security,150000,Handheld metal detectors,https://i.ibb.co/Vcgf4dfh/Whats-App-Image-2026-02-07-at-08-12-54-1.jpg,active,20
+14,Security Walk Through Detectors,Security,15000000,Walk through metal detectors,https://i.ibb.co/Rpv68b2F/KAPI-DEDEKTORU-scaled.jpg,active,5
+15,Digitalizing Company Logs,IT Equipment,100000,Company log digitalization service,https://i.ibb.co/RTjJRcLN/lod4.jpg,active,999
+16,Security Colored Cameras,Security,150000,Color security cameras,https://i.ibb.co/tw0c1h84/cctv-package-2-dec-2025-652.jpg,active,25
+17,Camera Installation Full Package,Security,2500000,Complete camera installation package,https://i.ibb.co/7tk9tZvD/Whats-App-Image-2026-02-07-at-17-52-28.jpg,active,10
+18,Office Executive Chairs,Office Supplies,800000,Executive office chairs,https://i.ibb.co/XxpTfwrQ/Whats-App-Image-2026-02-07-at-16-57-20.jpg,active,15
+19,Visitors Boardroom Chairs,Office Supplies,500000,Visitors and boardroom chairs,https://i.ibb.co/Tqk9rYFV/Whats-App-Image-2026-02-07-at-16-30-16.jpg,active,20
+20,Reception Chairs 3 Seaters,Office Supplies,700000,3-seater reception chairs,https://i.ibb.co/8DQnQj81/610-Lo16tq-VL-AC-UF894-1000-QL80.jpg,active,12
+21,Office Executive Tables,Office Supplies,2000000,Executive office tables,https://i.ibb.co/fGzbXd16/Whats-App-Image-2026-02-07-at-16-28-35.jpg,active,8
+22,Office Cabin,Office Supplies,800000,Office cabin furniture,https://i.ibb.co/d0QpbdVL/4-drawer-filing-cabinet-Oak-3-scaled-500x500.jpg,active,10
+23,Desktop Computer All in One 12th Gen,IT Equipment,3500000,All-in-one desktop computer 12th generation,https://i.ibb.co/8LhjHScg/Whats-App-Image-2026-02-07-at-17-46-47.jpg,active,7
+24,Laptop Basic 12th Gen,IT Equipment,1500000,Basic laptop 12th generation,https://i.ibb.co/9HSrfgY2/Whats-App-Image-2026-02-07-at-17-34-35.jpg,active,12
+25,Laptop Mid-Range 12th Gen,IT Equipment,2000000,Mid-range laptop 12th generation,,active,10
+26,Laptop Premium 12th Gen,IT Equipment,3000000,Premium laptop 12th generation,,active,6
+27,Laptop Executive 12th Gen,IT Equipment,4000000,Executive laptop 12th generation,,active,4
+28,Commercial Printer Basic,IT Equipment,5000000,Basic commercial printer,,active,5
+29,Commercial Printer Mid-Range,IT Equipment,7000000,Mid-range commercial printer,,active,4
+30,Commercial Printer Premium,IT Equipment,10000000,Premium commercial printer,,active,3
+31,Commercial Printer Executive,IT Equipment,15000000,Executive commercial printer,https://i.ibb.co/fzVHqsyh/Whats-App-Image-2026-02-07-at-17-30-22.jpg,active,2
+32,Colored Printer Basic,IT Equipment,1500000,Basic colored printer,,active,8
+33,Colored Printer Mid-Range,IT Equipment,2000000,Mid-range colored printer,,active,6
+34,Colored Printer Premium,IT Equipment,3000000,Premium colored printer,,active,4
+35,Colored Printer Executive,IT Equipment,5000000,Executive colored printer,,active,3
+36,Copier Printer,IT Equipment,1500000,Photocopier printer,,active,7
+37,Toner Cartridge Basic,IT Equipment,150000,Basic toner cartridge,,active,50
+38,Toner Cartridge Mid-Range,IT Equipment,250000,Mid-range toner cartridge,,active,30
+39,Toner Cartridge Original,IT Equipment,500000,Original toner cartridge,https://i.ibb.co/23cVYThK/Whats-App-Image-2026-02-07-at-17-48-49.jpg,active,20
+40,PHD Graduation Gown Full Set,Branding,500000,Complete PHD graduation gown set,https://i.ibb.co/S4RcGmzX/Whats-App-Image-2026-02-07-at-16-43-34.jpg,active,25
+41,Master's Degree Gowns Full Set,Branding,350000,Complete Master's degree gown set,https://i.ibb.co/ds7gWRVK/Whats-App-Image-2026-02-07-at-16-45-47.jpg,active,30
+42,Degree Graduation Gown Full Set,Branding,150000,Complete Degree graduation gown set,https://i.ibb.co/HT4nfTBp/Whats-App-Image-2026-02-07-at-17-33-28.jpg,active,50
+43,Gown Hiring Service,Branding,25000,Gown hiring service,https://i.ibb.co/fWHW9jg/Whats-App-Image-2026-02-07-at-16-38-57.jpg,active,999
+44,School Uniforms,Branding,100000,Complete school uniform set,https://i.ibb.co/dw2fdZzb/Whats-App-Image-2026-02-07-at-17-39-26.jpg,active,100
+45,College Uniforms,Branding,120000,Complete college uniform set,,active,80
+46,Sweaters Pre-Primary,Branding,30000,Pre-primary school sweaters,,active,120
+47,Sweaters Secondary,Branding,50000,Secondary school sweaters,,active,100
+48,Staff Corporate Uniforms,Branding,100000,Staff/corporate uniforms,https://i.ibb.co/ZpfzvT6T/Whats-App-Image-2026-02-07-at-17-43-17.jpg,active,60
+49,Staff T-Shirts Color,Branding,25000,Colored staff T-shirts,https://i.ibb.co/21kGMRHs/Whats-App-Image-2026-02-07-at-17-28-27.jpg,active,150
+50,Staff T-Shirts Round Neck,Branding,15000,Round neck staff T-shirts,,active,200
