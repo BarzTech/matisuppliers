@@ -811,8 +811,9 @@
 
    <script src="products.js"></script>
 <script>
-    // ================= PERMANENT GOOGLE SHEETS SOLUTION =================
+    // ================= CSV-BASED PRODUCTS SOLUTION =================
     let products = [];
+    let csvData = '';
     
     // ================= WEBSITE INITIALIZATION =================
     document.addEventListener('DOMContentLoaded', function() {
@@ -821,68 +822,153 @@
         // Setup event listeners
         setupEventListeners();
         
-        // Load products (from auto-generated file)
-        loadProducts();
+        // Load products from CSV
+        loadProductsFromCSV();
         
         console.log('Website initialization complete.');
     });
     
-    // ================= LOAD PRODUCTS =================
-    function loadProducts() {
-        console.log('Loading products...');
+    // ================= LOAD PRODUCTS FROM CSV =================
+    async function loadProductsFromCSV() {
+        console.log('Loading products from CSV...');
         
-        // Method 1: Use auto-generated products.js
-        if (window.productsData && window.productsData.products) {
-            products = window.productsData.products;
-            console.log('Loaded from products.js:', products.length);
-        } 
-        // Method 2: Try fetching products.json
-        else {
-            fetch('products.json')
-                .then(response => response.json())
-                .then(data => {
-                    products = data.products || [];
-                    console.log('Loaded from products.json:', products.length);
-                    displayProducts();
-                })
-                .catch(error => {
-                    console.error('Error loading products:', error);
-                    loadFallbackProducts();
-                });
+        try {
+            // Fetch the CSV file
+            const response = await fetch('products.csv?' + new Date().getTime());
+            
+            if (!response.ok) {
+                throw new Error('products.csv not found');
+            }
+            
+            csvData = await response.text();
+            console.log('CSV data loaded:', csvData.length, 'characters');
+            
+            // Parse CSV
+            products = parseCSV(csvData);
+            console.log(`✅ Parsed ${products.length} products from CSV`);
+            
+            // Display products
+            displayProducts();
+            
+            // Save to localStorage as backup
+            saveToLocalStorage();
+            
+        } catch (error) {
+            console.error('Error loading CSV:', error);
+            loadFallbackProducts();
         }
-        
-        // Save to localStorage as backup
-        if (products.length > 0) {
-            localStorage.setItem('matiProducts', JSON.stringify(products));
-        }
-        
-        displayProducts();
     }
     
-    // Fallback if both methods fail
-    function loadFallbackProducts() {
-        const localProducts = JSON.parse(localStorage.getItem('matiProducts')) || [];
+    // ================= CSV PARSER =================
+    function parseCSV(csvText) {
+        const lines = csvText.split('\n').filter(line => line.trim() !== '');
+        if (lines.length < 2) return [];
         
-        if (localProducts.length > 0) {
-            products = localProducts;
-            console.log('Using localStorage backup:', products.length);
-        } else {
-            // Ultimate fallback
-            products = [
-                {
-                    id: 1,
-                    name: "HP Laptop ProBook",
-                    category: "it",
-                    price: 1500000,
-                    description: "Sample product - edit your Google Sheet",
-                    image: "https://images.unsplash.com/photo-1496181133206-80ce9b88a853",
-                    status: "active",
-                    stock: 5
-                }
-            ];
-            console.log('Using default sample product');
+        const headers = lines[0].split(',').map(h => h.trim());
+        const products = [];
+        
+        for (let i = 1; i < lines.length; i++) {
+            const line = lines[i];
+            const values = parseCSVLine(line);
+            
+            const product = {};
+            headers.forEach((header, index) => {
+                product[header.toLowerCase()] = values[index] || '';
+            });
+            
+            // Ensure required fields exist
+            if (product.name && product.price) {
+                // Convert price to number
+                product.price = parseFloat(product.price) || 0;
+                // Ensure category exists
+                product.category = product.category || 'other';
+                // Ensure status exists
+                product.status = product.status || 'active';
+                // Ensure ID exists
+                product.id = product.id || i;
+                
+                products.push(product);
+            }
         }
         
+        return products;
+    }
+    
+    // Helper function to parse CSV line with quoted values
+    function parseCSVLine(line) {
+        const values = [];
+        let current = '';
+        let inQuotes = false;
+        
+        for (let i = 0; i < line.length; i++) {
+            const char = line[i];
+            
+            if (char === '"') {
+                inQuotes = !inQuotes;
+            } else if (char === ',' && !inQuotes) {
+                values.push(current.trim());
+                current = '';
+            } else {
+                current += char;
+            }
+        }
+        
+        values.push(current.trim());
+        return values;
+    }
+    
+    // ================= FALLBACK PRODUCT LOADING =================
+    function loadFallbackProducts() {
+        console.log('Trying fallback loading methods...');
+        
+        // Check localStorage first
+        const savedProducts = localStorage.getItem('matiProducts');
+        if (savedProducts) {
+            try {
+                products = JSON.parse(savedProducts);
+                console.log(`✅ Loaded ${products.length} products from localStorage`);
+                displayProducts();
+                return;
+            } catch (e) {
+                console.warn('Failed to parse localStorage data');
+            }
+        }
+        
+        // Ultimate fallback - sample products
+        products = [
+            {
+                id: 1,
+                name: "Security Uniforms",
+                category: "security",
+                price: 150000,
+                description: "High quality security uniforms for all sizes",
+                image: "https://i.ibb.co/MTzqjxL/security-uniform-1.jpg",
+                status: "active",
+                stock: 100
+            },
+            {
+                id: 2,
+                name: "Security Boots",
+                category: "security",
+                price: 120000,
+                description: "Durable security boots for all sizes",
+                image: "https://i.ibb.co/xt3gLz4/security-boots.jpg",
+                status: "active",
+                stock: 50
+            },
+            {
+                id: 3,
+                name: "HP Laptop ProBook",
+                category: "it",
+                price: 1500000,
+                description: "Professional business laptop with latest specifications",
+                image: "https://images.unsplash.com/photo-1496181133206-80ce9b88a853",
+                status: "active",
+                stock: 5
+            }
+        ];
+        
+        console.log('Using sample products');
         displayProducts();
     }
     
@@ -893,56 +979,89 @@
         
         productsContainer.innerHTML = '';
         
-        const filteredProducts = filter === 'all' 
-            ? products.filter(p => p.status === 'active')
-            : products.filter(p => p.category === filter && p.status === 'active');
+        // Filter products
+        let filteredProducts = products;
+        if (filter !== 'all') {
+            filteredProducts = products.filter(p => 
+                p.category && p.category.toLowerCase() === filter && p.status === 'active'
+            );
+        } else {
+            filteredProducts = products.filter(p => p.status === 'active');
+        }
         
         if (filteredProducts.length === 0) {
             productsContainer.innerHTML = `
                 <div style="text-align: center; grid-column: 1/-1; padding: 40px; color: var(--gray);">
                     <i class="fas fa-box-open fa-2x" style="margin-bottom: 15px; display: block; color: #ccc;"></i>
-                    <p>No products found.</p>
+                    <p>No products found in "${filter}" category.</p>
                     <p style="font-size: 14px; margin-top: 10px;">
-                        Products will auto-update from Google Sheets every 6 hours.
+                        Products are loaded from products.csv file.
+                        <br><br>
+                        <button onclick="refreshProducts()" style="
+                            background: var(--green);
+                            color: white;
+                            border: none;
+                            padding: 10px 20px;
+                            border-radius: 5px;
+                            cursor: pointer;
+                            margin-top: 10px;
+                        ">
+                            <i class="fas fa-sync-alt"></i> Refresh Products
+                        </button>
                     </p>
                 </div>
             `;
             return;
         }
         
+        // Category display names
         const categoryNames = {
-            'it': 'IT Equipment', 'medical': 'Medical Equipment',
-            'security': 'Security Equipment', 'office': 'Office Supplies',
-            'academic': 'Academic Supplies', 'branding': 'Branding & Advertising',
-            'other': 'Other'
+            'it': 'IT Equipment',
+            'medical': 'Medical Equipment',
+            'security': 'Security Equipment',
+            'office': 'Office Supplies',
+            'academic': 'Academic Supplies',
+            'branding': 'Branding & Advertising',
+            'other': 'Other Products'
         };
         
+        // Display each product
         filteredProducts.forEach(product => {
             const productCard = document.createElement('div');
             productCard.className = 'product-card';
             
-            const categoryName = categoryNames[product.category] || 'Unknown';
-            const formattedPrice = product.price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+            const category = product.category ? product.category.toLowerCase() : 'other';
+            const categoryName = categoryNames[category] || 'Product';
             
-            // IMAGE HANDLING
+            // Format price
+            const formattedPrice = typeof product.price === 'number' 
+                ? product.price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+                : String(product.price || '0').replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+            
+            // Handle image
             let imageContent = '';
             if (product.image && product.image.trim() !== '') {
-                if (product.image.startsWith('http')) {
-                    imageContent = `<img src="${product.image}" alt="${product.name}" loading="lazy">`;
-                } else {
-                    imageContent = getFallbackIcon(product.category);
-                }
+                imageContent = `<img src="${product.image}" alt="${product.name}" loading="lazy" 
+                    onerror="this.onerror=null; this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzAwIiBoZWlnaHQ9IjIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjMDA4MDAwIi8+PHRleHQgeD0iNTAlIiB5PSI1MCUiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIxNiIgZmlsbD0id2hpdGUiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGR5PSIuM2VtIj5NYXRpIFN1cHBsaWVyczwvdGV4dD48L3N2Zz4=';">`;
             } else {
-                imageContent = getFallbackIcon(product.category);
+                imageContent = getFallbackIcon(category);
             }
+            
+            // Product description
+            const description = product.description 
+                ? (product.description.length > 80 
+                    ? product.description.substring(0, 80) + '...' 
+                    : product.description)
+                : 'No description available';
             
             productCard.innerHTML = `
                 <div class="product-img">${imageContent}</div>
                 <div class="product-info">
                     <span class="product-category">${categoryName}</span>
-                    <h3>${product.name}</h3>
-                    <p>${product.description ? product.description.substring(0, 80) + (product.description.length > 80 ? '...' : '') : ''}</p>
+                    <h3>${product.name || 'Unnamed Product'}</h3>
+                    <p>${description}</p>
                     <div class="product-price">UGX ${formattedPrice}</div>
+                    ${product.stock ? `<p style="font-size: 12px; color: var(--green); margin-bottom: 10px;"><i class="fas fa-box"></i> Stock: ${product.stock}</p>` : ''}
                     <button class="cta-button" onclick="requestProductQuotation(${product.id})" style="padding: 10px 20px; font-size: 14px; width: 100%;">
                         <i class="fas fa-quote-right"></i> Request Quote
                     </button>
@@ -953,28 +1072,55 @@
         });
     }
     
+    // Get fallback icon based on category
     function getFallbackIcon(category) {
         const icons = {
-            'it': 'fas fa-laptop', 'medical': 'fas fa-user-md',
-            'security': 'fas fa-shield-alt', 'office': 'fas fa-chair',
-            'academic': 'fas fa-graduation-cap', 'branding': 'fas fa-bullhorn',
+            'it': 'fas fa-laptop',
+            'medical': 'fas fa-user-md',
+            'security': 'fas fa-shield-alt',
+            'office': 'fas fa-chair',
+            'academic': 'fas fa-graduation-cap',
+            'branding': 'fas fa-bullhorn',
             'other': 'fas fa-box'
         };
-        return `<i class="${icons[category] || 'fas fa-box'} fa-3x" style="color: var(--green); opacity: 0.5;"></i>`;
+        
+        const iconClass = icons[category] || 'fas fa-box';
+        return `<i class="${iconClass} fa-3x" style="color: var(--green); opacity: 0.5;"></i>`;
     }
     
+    // Save products to localStorage
+    function saveToLocalStorage() {
+        if (products.length > 0) {
+            localStorage.setItem('matiProducts', JSON.stringify(products));
+            localStorage.setItem('matiProductsLastUpdated', new Date().toISOString());
+            console.log('Products saved to localStorage');
+        }
+    }
+    
+    // Request quotation via WhatsApp
     function requestProductQuotation(productId) {
-        const product = products.find(p => p.id === productId);
-        if (!product) return;
-
-        const message = `Hello MATI SUPPLIERS,%0A%0AProduct: ${product.name}%0ACategory: ${product.category}%0APrice: UGX ${product.price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")}%0A%0APlease send quotation.`;
-
-        const phone = "256753402888";
-        window.open(`https://wa.me/${phone}?text=${message}`, "_blank");
+        const product = products.find(p => p.id == productId);
+        if (!product) {
+            alert('Product not found!');
+            return;
+        }
+        
+        const formattedPrice = typeof product.price === 'number' 
+            ? product.price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+            : product.price;
+        
+        // Create WhatsApp message
+        const message = `Hello MATI SUPPLIERS!%0A%0A*Product Inquiry*%0A%0AProduct: ${product.name}%0ACategory: ${product.category || 'General'}%0APrice: UGX ${formattedPrice}%0A%0A*My Details*%0AName: _____%0AOrganization: _____%0AQuantity Needed: _____%0ALocation: _____%0A%0APlease send me a quotation for this product.`;
+        
+        const whatsappUrl = `https://wa.me/256753402888?text=${encodeURIComponent(message)}`;
+        
+        // Open WhatsApp
+        window.open(whatsappUrl, '_blank');
     }
     
     // ================= EVENT LISTENERS =================
     function setupEventListeners() {
+        // Mobile menu toggle
         const menuBtn = document.getElementById('menuBtn');
         const navMenu = document.getElementById('navMenu');
         
@@ -987,6 +1133,7 @@
             });
         }
         
+        // Filter buttons
         document.querySelectorAll('.filter-btn').forEach(btn => {
             btn.addEventListener('click', () => {
                 document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
@@ -995,6 +1142,7 @@
             });
         });
         
+        // Smooth scrolling for anchor links
         document.querySelectorAll('a[href^="#"]').forEach(anchor => {
             anchor.addEventListener('click', function(e) {
                 const href = this.getAttribute('href');
@@ -1003,32 +1151,56 @@
                 const targetElement = document.querySelector(href);
                 if (targetElement) {
                     e.preventDefault();
+                    // Close mobile menu if open
                     if (navMenu) navMenu.classList.remove('active');
                     if (menuBtn) menuBtn.innerHTML = '<i class="fas fa-bars"></i>';
-                    window.scrollTo({ top: targetElement.offsetTop - 80, behavior: 'smooth' });
+                    
+                    window.scrollTo({
+                        top: targetElement.offsetTop - 80,
+                        behavior: 'smooth'
+                    });
                 }
             });
         });
+        
+        // Auto-refresh products every hour
+        setInterval(() => {
+            const lastUpdate = localStorage.getItem('matiProductsLastUpdated');
+            if (lastUpdate) {
+                const hoursSinceUpdate = (new Date() - new Date(lastUpdate)) / (1000 * 60 * 60);
+                if (hoursSinceUpdate > 1) {
+                    console.log('Auto-refreshing products...');
+                    refreshProducts();
+                }
+            }
+        }, 60 * 60 * 1000); // Check every hour
     }
     
-    // Manual refresh function
+    // ================= PUBLIC FUNCTIONS =================
     window.refreshProducts = function() {
-        fetch('products.json?' + new Date().getTime())
-            .then(response => response.json())
-            .then(data => {
-                products = data.products || [];
-                localStorage.setItem('matiProducts', JSON.stringify(products));
-                displayProducts();
-                alert(`Products refreshed! Found ${products.length} products.`);
-            })
-            .catch(() => {
-                alert('Could not refresh. Products auto-update every 6 hours.');
-            });
+        console.log('Manual refresh triggered...');
+        loadProductsFromCSV();
     };
     
-    // Make functions available globally
     window.requestProductQuotation = requestProductQuotation;
     window.displayProducts = displayProducts;
+    
+    // Add CSV download function for admin
+    window.downloadCSV = function() {
+        if (csvData) {
+            const blob = new Blob([csvData], { type: 'text/csv' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'mati-products-backup.csv';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            window.URL.revokeObjectURL(url);
+        } else {
+            alert('No CSV data loaded yet. Please refresh the page.');
+        }
+    };
 </script>
 </body>
 </html>
