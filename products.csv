@@ -1,0 +1,10 @@
+id,name,category,price,description,image,status,stock
+1,Security Uniforms,security,150000,For all sizes,https://i.ibb.co/MTzqjxL/security-uniform-1.jpg,active,100
+2,Security Uniforms,security,150000,For all sizes,https://i.ibb.co/20qp6kK/security-uniform-2.jpg,active,100
+3,Security Uniforms,security,150000,For all sizes,https://i.ibb.co/rfTK4HM/security-uniform-3.jpg,active,100
+4,Security Boots,security,120000,For all sizes,https://i.ibb.co/xt3gLz4/security-boots.jpg,active,100
+5,Security Belts,security,25000,Strong material,https://i.ibb.co/jvz8Y9P/security-belt.jpg,active,100
+6,Security Walkie Talkie radios pair,security,250000,Long Range and Quality tested,https://i.ibb.co/sM9z8Tt/walkie-talkie.jpg,active,100
+7,Security Car searching mirrors,security,350000,Wide mirrors,https://i.ibb.co/xt3gLz4/car-mirror.jpg,active,100
+8,HP Laptop ProBook,it,2500000,15-inch Business Laptop,https://images.unsplash.com/photo-1496181133206-80ce9b88a853,active,15
+9,Medical Equipment Set,medical,850000,Complete medical kit,https://images.unsplash.com/photo-1582750433449-648ed127bb54,active,25
