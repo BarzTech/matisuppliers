@@ -1,26 +1,29 @@
 name: Auto Update Products
-
 on:
   schedule:
-    - cron: '42 17 * * *'
+    - cron: '0 18 * * *'  # Run at 18:00 UTC (6 PM)
 
 jobs:
   update:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - name: Checkout with full history
+        uses: actions/checkout@v3
         with:
+          fetch-depth: 0  # 🔥 GET ALL HISTORY
           token: ${{ secrets.GITHUB_TOKEN }}
       
       - name: Setup Git
         run: |
-          git config user.name "MATI SUPPLIERS Auto-Update"
-          git config user.email "actions@github.com"
+          git config user.name "Auto-Updater"
+          git config user.email "auto-updater@users.noreply.github.com"
       
-      - name: Pull and rebase
-        run: git pull origin main --rebase --autostash
+      # 🔥 CRITICAL: SYNC BEFORE MAKING CHANGES
+      - name: Sync with remote
+        run: |
+          git pull origin main --rebase --autostash
       
-      - name: Run update
+      - name: Update products
         run: |
           npm install
           node generate-products.js
@@ -28,7 +31,10 @@ jobs:
       - name: Commit and push
         run: |
           git add .
-          git diff --quiet && git diff --staged --quiet || {
-            git commit -m "🔄 Auto-update products [$(date +'%Y-%m-%d %H:%M:%S')]"
+          # Only commit if there are changes
+          if git diff --staged --quiet; then
+            echo "No changes to commit"
+          else
+            git commit -m "🔄 Auto-update products [$(date -u +'%Y-%m-%d %H:%M:%S')]"
             git push origin main
-          }
+          fi
