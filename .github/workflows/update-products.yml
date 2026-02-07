@@ -1,7 +1,7 @@
 name: Auto Update Products
 on:
   schedule:
-    - cron: '*/15 * * * *'  # Every 15 minutes for testing
+    - cron: '0 */2 * * *'  # Every 2 hours
   workflow_dispatch:
 
 jobs:
@@ -16,29 +16,20 @@ jobs:
         run: |
           git config user.name "Auto-Updater"
           git config user.email "updater@github.com"
-          git pull origin main
       
-      - name: Setup Node.js
-        uses: actions/setup-node@v3
-        with:
-          node-version: '18'
-          cache: 'npm'
+      - name: Pull latest changes
+        run: git pull origin main
       
-      - name: Install dependencies
+      - name: Update products
         run: |
-          # Remove corrupted package-lock.json if exists
-          rm -f package-lock.json
-          # Install fresh
+          # Install csv-parse if needed
           npm install csv-parse
-          # Generate new package-lock.json
-          npm install
-      
-      - name: Generate products from CSV
-        run: node generate-products.js
+          # Generate products
+          node generate-products.js
       
       - name: Commit and push
         run: |
           git add .
-          git commit -m "🔄 Auto-update from CSV [$(date -u +'%Y-%m-%d %H:%M:%S')]" || echo "No changes"
+          git commit -m "📦 Updated products [$(date -u +'%Y-%m-%d %H:%M:%S')]" || echo "No changes"
           git pull origin main
           git push origin main
