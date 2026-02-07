@@ -1,0 +1,16 @@
+{
+  "name": "mati-suppliers",
+  "version": "1.0.0",
+  "description": "MATI SUPPLIERS INTERNATIONAL-SMC LTD - Procurement & Supply Chain Solutions",
+  "main": "generate-products.js",
+  "scripts": {
+    "generate": "node generate-products.js",
+    "test": "echo \"No tests specified\" && exit 0"
+  },
+  "keywords": ["suppliers", "procurement", "uganda", "business"],
+  "author": "MATI SUPPLIERS",
+  "license": "MIT",
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}
