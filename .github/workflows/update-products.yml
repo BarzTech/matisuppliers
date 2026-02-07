@@ -1,59 +1,88 @@
-name: Auto Update Products (Reusable)
+name: Auto Update Products
 
 on:
-  workflow_call:
-    inputs:
-      node_version:
-        required: false
-        type: string
-        default: '18'
-      script_path:
-        required: false
-        type: string
-        default: 'generate-products.js'
+  schedule:
+    - cron: '10 18 * * *'  # Changed time to avoid conflict
+  workflow_dispatch:
+
+# ⚠️ PREVENT MULTIPLE RUNS
+concurrency:
+  group: auto-update
+  cancel-in-progress: true
 
 jobs:
   update:
     runs-on: ubuntu-latest
-
-    concurrency:
-      group: auto-update-products
-      cancel-in-progress: false
-
+    timeout-minutes: 10  # Auto-cancel if stuck
+    
     steps:
-      - name: Checkout with full history
-        uses: actions/checkout@v3
+      # STEP 1: Checkout
+      - uses: actions/checkout@v3
         with:
           fetch-depth: 0
           token: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: ${{ inputs.node_version }}
-
+      
+      # STEP 2: Setup - CRITICAL
       - name: Setup Git
         run: |
-          git config user.name "Auto-Updater"
-          git config user.email "auto-updater@users.noreply.github.com"
-
+          git config user.name "github-actions"
+          git config user.email "github-actions@github.com"
+          git config pull.rebase true
+          # Set URL with token for push access
+          git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}
+      
+      # STEP 3: PULL BEFORE ANYTHING ELSE
       - name: Sync with remote
         run: |
+          echo "Pulling latest changes..."
           git pull origin main --rebase --autostash
-
-      - name: Install dependencies
-        run: npm install
-
-      - name: Run product update script
-        run: node ${{ inputs.script_path }}
-
-      - name: Commit and push
+          echo "✅ Synced with remote"
+      
+      # STEP 4: Your update
+      - name: Update products
+        run: |
+          npm ci
+          node generate-products.js
+      
+      # STEP 5: Check for changes
+      - name: Check changes
+        id: check
+        run: |
+          if git diff --quiet; then
+            echo "has_changes=false" >> $GITHUB_OUTPUT
+            echo "No changes detected"
+          else
+            echo "has_changes=true" >> $GITHUB_OUTPUT
+            echo "Changes detected"
+          fi
+      
+      # STEP 6: Commit if changes
+      - name: Commit
+        if: steps.check.outputs.has_changes == 'true'
         run: |
           git add .
-          if git diff --staged --quiet; then
-            echo "No changes to commit"
-          else
-            git commit -m "🔄 Auto-update products [$(date -u +'%Y-%m-%d %H:%M:%S')]"
-            git pull --rebase origin main
-            git push origin main
-          fi
+          git commit -m "🔄 Auto-update products [$(date -u +'%Y-%m-%dT%H:%M:%SZ')]"
+      
+      # STEP 7: PUSH with retry logic
+      - name: Push changes
+        if: steps.check.outputs.has_changes == 'true'
+        run: |
+          echo "Attempting to push..."
+          MAX_RETRIES=3
+          RETRY_COUNT=0
+          
+          while [ $RETRY_COUNT -lt $MAX_RETRIES ]; do
+            if git push origin main; then
+              echo "✅ Push successful on attempt $((RETRY_COUNT+1))"
+              exit 0
+            else
+              RETRY_COUNT=$((RETRY_COUNT+1))
+              echo "⚠️ Push failed (attempt $RETRY_COUNT/$MAX_RETRIES)"
+              echo "Pulling latest and retrying..."
+              git pull origin main --rebase --autostash
+              sleep 2
+            fi
+          done
+          
+          echo "❌ Failed to push after $MAX_RETRIES attempts"
+          exit 1
