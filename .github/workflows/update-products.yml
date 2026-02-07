@@ -1,88 +1,38 @@
 name: Auto Update Products
-
 on:
   schedule:
-    - cron: '10 18 * * *'  # Changed time to avoid conflict
+    - cron: '0 8 * * *'  # Daily at 8 AM UTC
   workflow_dispatch:
-
-# ⚠️ PREVENT MULTIPLE RUNS
-concurrency:
-  group: auto-update
-  cancel-in-progress: true
 
 jobs:
   update:
     runs-on: ubuntu-latest
-    timeout-minutes: 10  # Auto-cancel if stuck
-    
     steps:
-      # STEP 1: Checkout
       - uses: actions/checkout@v3
         with:
-          fetch-depth: 0
           token: ${{ secrets.GITHUB_TOKEN }}
       
-      # STEP 2: Setup - CRITICAL
       - name: Setup Git
         run: |
-          git config user.name "github-actions"
-          git config user.email "github-actions@github.com"
-          git config pull.rebase true
-          # Set URL with token for push access
-          git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}
+          git config user.name "Auto-Updater"
+          git config user.email "updater@github.com"
+          git pull origin main
       
-      # STEP 3: PULL BEFORE ANYTHING ELSE
-      - name: Sync with remote
-        run: |
-          echo "Pulling latest changes..."
-          git pull origin main --rebase --autostash
-          echo "✅ Synced with remote"
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+          cache: 'npm'
       
-      # STEP 4: Your update
-      - name: Update products
-        run: |
-          npm ci
-          node generate-products.js
+      - name: Install dependencies
+        run: npm ci
       
-      # STEP 5: Check for changes
-      - name: Check changes
-        id: check
-        run: |
-          if git diff --quiet; then
-            echo "has_changes=false" >> $GITHUB_OUTPUT
-            echo "No changes detected"
-          else
-            echo "has_changes=true" >> $GITHUB_OUTPUT
-            echo "Changes detected"
-          fi
+      - name: Generate products from CSV
+        run: node generate-products.js
       
-      # STEP 6: Commit if changes
-      - name: Commit
-        if: steps.check.outputs.has_changes == 'true'
+      - name: Commit and push
         run: |
           git add .
-          git commit -m "🔄 Auto-update products [$(date -u +'%Y-%m-%dT%H:%M:%SZ')]"
-      
-      # STEP 7: PUSH with retry logic
-      - name: Push changes
-        if: steps.check.outputs.has_changes == 'true'
-        run: |
-          echo "Attempting to push..."
-          MAX_RETRIES=3
-          RETRY_COUNT=0
-          
-          while [ $RETRY_COUNT -lt $MAX_RETRIES ]; do
-            if git push origin main; then
-              echo "✅ Push successful on attempt $((RETRY_COUNT+1))"
-              exit 0
-            else
-              RETRY_COUNT=$((RETRY_COUNT+1))
-              echo "⚠️ Push failed (attempt $RETRY_COUNT/$MAX_RETRIES)"
-              echo "Pulling latest and retrying..."
-              git pull origin main --rebase --autostash
-              sleep 2
-            fi
-          done
-          
-          echo "❌ Failed to push after $MAX_RETRIES attempts"
-          exit 1
+          git commit -m "📦 Updated products from CSV [$(date -u +'%Y-%m-%d %H:%M:%S')]" || echo "No changes"
+          git pull origin main
+          git push origin main
