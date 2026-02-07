@@ -1,8 +1,11 @@
 const fs = require('fs');
 const https = require('https');
 
+// YOUR GOOGLE SHEET
 const SHEET_ID = '2PACX-1vRVOL6rI9nUxm-bZURwflTwthZR3ZtzLYGFDMZMNgdN0XcmJi6ngpTeMthNmyenoMHZi2-ca4cMeZof';
-const SHEET_URL = `https://docs.google.com/spreadsheets/d/e/${SHEET_ID}/pub?output=csv`;
+const SHEET_URL = `https://docs.google.com/spreadsheets/d/e/${SHEET_ID}/pub?gid=0&single=true&output=csv`;
+
+console.log('📦 Generating products from Google Sheets...');
 
 function fetchCSV(url) {
     return new Promise((resolve, reject) => {
@@ -26,14 +29,12 @@ function parseCSV(csvText) {
         const product = {};
         
         headers.forEach((header, index) => {
-            if (index < values.length) {
-                product[header] = values[index];
-            }
+            if (index < values.length) product[header] = values[index];
         });
         
         const processedProduct = {
             id: parseInt(product.id) || i,
-            name: product.name || 'Unnamed Product',
+            name: product.name || 'Product ' + i,
             category: product.category || 'other',
             price: parseInt(product.price) || 0,
             description: product.description || '',
@@ -52,23 +53,42 @@ function parseCSV(csvText) {
 
 async function main() {
     try {
-        console.log('Fetching data from Google Sheets...');
+        console.log('📥 Fetching from Google Sheets...');
         const csvText = await fetchCSV(SHEET_URL);
         
+        console.log('📊 Parsing data...');
         const products = parseCSV(csvText);
-        const jsonData = { products };
+        
+        const jsonData = { 
+            products,
+            meta: {
+                lastUpdated: new Date().toISOString(),
+                totalProducts: products.length
+            }
+        };
         
         fs.writeFileSync('products.json', JSON.stringify(jsonData, null, 2));
-        console.log(`✅ Generated products.json with ${products.length} products`);
-        
-        // Also create a products.js for direct inclusion
         fs.writeFileSync('products.js', `window.productsData = ${JSON.stringify(jsonData)};`);
-        console.log('✅ Generated products.js');
+        
+        console.log(`✅ Generated ${products.length} products`);
+        console.log(`🕒 Updated: ${new Date().toLocaleTimeString()}`);
         
     } catch (error) {
-        console.error('Error:', error.message);
-        // Create empty products file
-        fs.writeFileSync('products.json', JSON.stringify({ products: [] }, null, 2));
+        console.error('❌ Error:', error.message);
+        
+        // Create empty files as fallback
+        const fallbackData = { 
+            products: [],
+            meta: {
+                lastUpdated: new Date().toISOString(),
+                error: error.message
+            }
+        };
+        
+        fs.writeFileSync('products.json', JSON.stringify(fallbackData, null, 2));
+        fs.writeFileSync('products.js', `window.productsData = ${JSON.stringify(fallbackData)};`);
+        
+        console.log('⚠️ Created empty product files as fallback');
     }
 }
 
