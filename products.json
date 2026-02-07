@@ -2,7 +2,7 @@
   "products": [
     {
       "id": 1,
-      "name": "Unnamed Product",
+      "name": "Product 1",
       "category": "other",
       "price": 0,
       "description": "",
@@ -12,7 +12,7 @@
     },
     {
       "id": 2,
-      "name": "Unnamed Product",
+      "name": "Product 2",
       "category": "other",
       "price": 0,
       "description": "",
@@ -22,7 +22,7 @@
     },
     {
       "id": 3,
-      "name": "Unnamed Product",
+      "name": "Product 3",
       "category": "other",
       "price": 0,
       "description": "",
@@ -32,7 +32,7 @@
     },
     {
       "id": 4,
-      "name": "Unnamed Product",
+      "name": "Product 4",
       "category": "other",
       "price": 0,
       "description": "",
@@ -42,7 +42,7 @@
     },
     {
       "id": 5,
-      "name": "Unnamed Product",
+      "name": "Product 5",
       "category": "other",
       "price": 0,
       "description": "",
@@ -52,7 +52,7 @@
     },
     {
       "id": 6,
-      "name": "Unnamed Product",
+      "name": "Product 6",
       "category": "other",
       "price": 0,
       "description": "",
@@ -62,7 +62,7 @@
     },
     {
       "id": 7,
-      "name": "Unnamed Product",
+      "name": "Product 7",
       "category": "other",
       "price": 0,
       "description": "",
@@ -72,7 +72,7 @@
     },
     {
       "id": 8,
-      "name": "Unnamed Product",
+      "name": "Product 8",
       "category": "other",
       "price": 0,
       "description": "",
@@ -82,7 +82,7 @@
     },
     {
       "id": 9,
-      "name": "Unnamed Product",
+      "name": "Product 9",
       "category": "other",
       "price": 0,
       "description": "",
@@ -90,5 +90,9 @@
       "status": "active",
       "stock": 0
     }
-  ]
+  ],
+  "meta": {
+    "lastUpdated": "2026-02-07T16:56:28.623Z",
+    "totalProducts": 9
+  }
 }
