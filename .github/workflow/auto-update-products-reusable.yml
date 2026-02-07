@@ -1,40 +1,59 @@
-name: Auto Update Products
+name: Auto Update Products (Reusable)
+
 on:
-  schedule:
-    - cron: '0 18 * * *'  # Run at 18:00 UTC (6 PM)
+  workflow_call:
+    inputs:
+      node_version:
+        required: false
+        type: string
+        default: '18'
+      script_path:
+        required: false
+        type: string
+        default: 'generate-products.js'
 
 jobs:
   update:
     runs-on: ubuntu-latest
+
+    concurrency:
+      group: auto-update-products
+      cancel-in-progress: false
+
     steps:
       - name: Checkout with full history
         uses: actions/checkout@v3
         with:
-          fetch-depth: 0  # 🔥 GET ALL HISTORY
+          fetch-depth: 0
           token: ${{ secrets.GITHUB_TOKEN }}
-      
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ inputs.node_version }}
+
       - name: Setup Git
         run: |
           git config user.name "Auto-Updater"
           git config user.email "auto-updater@users.noreply.github.com"
-      
-      # 🔥 CRITICAL: SYNC BEFORE MAKING CHANGES
+
       - name: Sync with remote
         run: |
           git pull origin main --rebase --autostash
-      
-      - name: Update products
-        run: |
-          npm install
-          node generate-products.js
-      
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Run product update script
+        run: node ${{ inputs.script_path }}
+
       - name: Commit and push
         run: |
           git add .
-          # Only commit if there are changes
           if git diff --staged --quiet; then
             echo "No changes to commit"
           else
             git commit -m "🔄 Auto-update products [$(date -u +'%Y-%m-%d %H:%M:%S')]"
+            git pull --rebase origin main
             git push origin main
           fi
