@@ -1097,26 +1097,30 @@
         }
     }
     
-    // Request quotation via WhatsApp
-    function requestProductQuotation(productId) {
-        const product = products.find(p => p.id == productId);
-        if (!product) {
-            alert('Product not found!');
-            return;
-        }
-        
-        const formattedPrice = typeof product.price === 'number' 
-            ? product.price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")
-            : product.price;
-        
-        // Create WhatsApp message
-        const message = `Hello MATI SUPPLIERS!%0A%0A*Product Inquiry*%0A%0AProduct: ${product.name}%0ACategory: ${product.category || 'General'}%0APrice: UGX ${formattedPrice}%0A%0A*My Details*%0AName: _____%0AOrganization: _____%0AQuantity Needed: _____%0ALocation: _____%0A%0APlease send me a quotation for this product.`;
-        
-        const whatsappUrl = `https://wa.me/256753402888?text=${encodeURIComponent(message)}`;
-        
-        // Open WhatsApp
-        window.open(whatsappUrl, '_blank');
+// Request quotation via WhatsApp - FIXED VERSION
+function requestProductQuotation(productId) {
+    const product = products.find(p => p.id == productId);
+    if (!product) {
+        alert('Product not found!');
+        return;
     }
+    
+    // Format price for display
+    const formattedPrice = typeof product.price === 'number' 
+        ? product.price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+        : String(product.price || '0').replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+    
+    // Create WhatsApp message - PROPERLY FORMATED
+    const message = `Hello MATI SUPPLIERS!%0A%0A*Product Inquiry*%0A%0AProduct: ${encodeURIComponent(product.name)}%0ACategory: ${encodeURIComponent(product.category || 'General')}%0APrice: UGX ${formattedPrice}%0A%0A*My Details*%0AName: _____%0AOrganization: _____%0AQuantity Needed: _____%0ALocation: _____%0A%0APlease send me a quotation for this product.`;
+    
+    // Alternative simpler message (uncomment to use):
+    // const message = `Hello MATI SUPPLIERS! I'm interested in ${encodeURIComponent(product.name)} (Category: ${encodeURIComponent(product.category || 'General')}, Price: UGX ${formattedPrice}). Please send me a quotation.`;
+    
+    const whatsappUrl = `https://wa.me/256753402888?text=${message}`;
+    
+    // Open WhatsApp in new tab
+    window.open(whatsappUrl, '_blank');
+}
     
     // ================= EVENT LISTENERS =================
     function setupEventListeners() {
