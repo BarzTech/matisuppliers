@@ -566,6 +566,48 @@
                 max-width: 300px;
             }
         }
+        /* Customers Section */
+.customers-section {
+    background-color: var(--light-green);
+}
+
+.customers-content {
+    text-align: center;
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.customers-list {
+    background-color: var(--white);
+    padding: 40px;
+    border-radius: 10px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+    border-left: 4px solid var(--red);
+    border-right: 4px solid var(--red);
+}
+
+.customers-list p {
+    font-size: 18px;
+    line-height: 2;
+    color: var(--black);
+    margin: 0;
+}
+
+.customers-list br {
+    margin-bottom: 8px;
+    display: block;
+}
+
+@media (max-width: 768px) {
+    .customers-list {
+        padding: 25px;
+    }
+    
+    .customers-list p {
+        font-size: 16px;
+        line-height: 1.8;
+    }
+}
     </style>
 </head>
 <body>
@@ -606,7 +648,39 @@
             <a href="#contact" class="cta-button">Get Quotation</a>
         </div>
     </section>
-
+<!-- Customers Section -->
+<section class="customers-section" id="customers">
+    <div class="section-container">
+        <div class="section-title">
+            <h2>Some Of Our Customers</h2>
+            <p>Trusted by leading organizations across Uganda</p>
+        </div>
+        
+        <div class="customers-content">
+            <div class="customers-list">
+                <p>
+                    • Kayunga Regional Referral Hospital<br>
+                    • Mulago Women's Specialist Hospital<br>
+                    • Bunyoro Kitara Kingdom<br>
+                    • Rwenzori International University Kasese<br>
+                    • Soroti Church of Uganda<br>
+                    • Buganda Kingdom<br>
+                    • Saracen Uganda LTD<br>
+                    • Magnum Security LTD<br>
+                    • A-1 Security Systems LTD<br>
+                    • Aclaim LTD<br>
+                    • Nakawa Vocational Training Institute<br>
+                    • Era92 LTD<br>
+                    • Exquists Solutions LTD<br>
+                    • KK Security LTD<br>
+                    • One Path Homeland Security LTD<br>
+                    • Mighty Security LTD<br>
+                    • Dannya Skin Experts
+                </p>
+            </div>
+        </div>
+    </div>
+</section>
     <!-- Services Section -->
     <section id="services">
         <div class="section-container">
